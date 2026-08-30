@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  
+  <!-- 🚀 SEO Meta Tags for Google Ranking (#1 Target: Vortex Vault / markiv) -->
+  <title>Vortex Vault | Neural AI Document & Lifecycle Management | markiv.site</title>
+  <meta name="description" content="Vortex Vault by markiv.site is a decentralized, AI-powered secure document management portal. Automate certificate validity, track warranty expiries, and access files via QR code.">
+  <meta name="keywords" content="Vortex Vault, markiv, markiv.site, AI document vault, document locker, smart warranty tracker, Vikram Bhardwaj, certificate expiry tracker, secure cloud vault">
+  <meta name="author" content="Vikram">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://markiv.site">
+
+  <!-- 🌐 Open Graph / Social Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://markiv.site">
+  <meta property="og:title" content="Vortex Vault - AI Document & Lifecycle Management">
+  <meta property="og:description" content="Secure, AI-driven document vault with automated expiry recognition, QR access, and cloud storage.">
+  <meta property="og:site_name" content="Vortex Vault on markiv.site">
+
+  <!-- 🔍 Google Rich Snippets / JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Vortex Vault",
+    "url": "https://markiv.site",
+    "description": "Decentralized AI-powered document vault and warranty lifecycle tracking system.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "All",
+    "author": {
+      "@type": "Person",
+      "name": "Vikram",
+      "email": "vikram.2872006@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Modinagar",
+        "addressRegion": "Uttar Pradesh",
+        "addressCountry": "IN"
+      }
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --bg-main: #02010a;
+      --bg-surface: rgba(13, 8, 30, 0.78);
+      --bg-card: rgba(18, 10, 42, 0.88);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-color: rgba(0, 240, 255, 0.28);
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --accent-pink: #ff007f;
+      --accent-glow: rgba(0, 240, 255, 0.4);
+      --input-bg: rgba(6, 2, 16, 0.9);
+      --drawer-bg: rgba(10, 4, 25, 0.98);
+      --card-shine: rgba(255, 255, 255, 0.08);
+      --grid-color: rgba(0, 240, 255, 0.06);
+    }
+
+    [data-theme="light"] {
+      --bg-main: #f1f5f9;
+      --bg-surface: rgba(255, 255, 255, 0.9);
+      --bg-card: rgba(255, 255, 255, 0.95);
+      --text-main: #090d16;
+      --text-sub: #64748b;
+      --border-color: rgba(99, 102, 241, 0.35);
+      --accent-cyan: #0284c7;
+      --accent-purple: #7c3aed;
+      --accent-pink: #ec4899;
+      --accent-glow: rgba(2, 132, 199, 0.25);
+      --input-bg: #ffffff;
+      --drawer-bg: rgba(255, 255, 255, 0.98);
+      --card-shine: rgba(0, 0, 0, 0.04);
+      --grid-color: rgba(99, 102, 241, 0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-main);
+      min-height: 100vh;
+      color: var(--text-main);
+      overflow-x: hidden;
+      position: relative;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    #bgCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+    .cyber-grid-floor {
+      position: fixed;
+      bottom: -30%;
+      left: -50%;
+      width: 200%;
+      height: 80%;
+      background-image: linear-gradient(var(--grid-color) 2px, transparent 2px), linear-gradient(90deg, var(--grid-color) 2px, transparent 2px);
+      background-size: 60px 60px;
+      transform: perspective(450px) rotateX(65deg);
+      z-index: 0;
+      pointer-events: none;
+      animation: gridMove 20s linear infinite;
+    }
+    @keyframes gridMove {
+      0% { transform: perspective(450px) rotateX(65deg) translateY(0); }
+      100% { transform: perspective(450px) rotateX(65deg) translateY(60px); }
+    }
+
+    .aurora-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .aurora-orb { position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.5; animation: floatNebula 14s infinite alternate ease-in-out; }
+    .orb-cyan { width: min(650px, 90vw); height: min(650px, 90vw); background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 70%); top: -15%; left: -10%; }
+    .orb-purple { width: min(700px, 95vw); height: min(700px, 95vw); background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%); bottom: -15%; right: -10%; animation-duration: 10s; }
+    .orb-pink { width: min(450px, 70vw); height: min(450px, 70vw); background: radial-gradient(circle, var(--accent-pink) 0%, transparent 70%); top: 40%; right: 20%; animation-duration: 8s; }
+    @keyframes floatNebula { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-40px, 60px) scale(1.15); } }
+
+    .dash-wrapper { position: relative; z-index: 2; max-width: 1200px; margin: 20px auto; padding: 0 16px 40px; }
+
+    /* Navbar */
+    .dash-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface);
+      backdrop-filter: blur(40px);
+      border: 1px solid var(--border-color);
+      padding: clamp(12px, 2vw, 16px) clamp(16px, 3vw, 26px);
+      border-radius: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      gap: 12px;
+    }
+    .nav-left { display: flex; align-items: center; gap: clamp(10px, 2vw, 16px); }
+    .nav-right { display: flex; align-items: center; gap: clamp(8px, 1.5vw, 12px); }
+
+    .drawer-btn, .theme-toggle-btn, .qr-btn {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(157, 78, 221, 0.15));
+      border: 1px solid var(--border-color);
+      color: var(--accent-cyan);
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 0 15px var(--accent-glow);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .drawer-btn:hover, .theme-toggle-btn:hover, .qr-btn:hover {
+      transform: scale(1.08) rotate(4deg);
+      background: var(--accent-cyan);
+      color: #000;
+      box-shadow: 0 0 25px var(--accent-cyan);
+    }
+
+    .dash-nav-info h1 { font-size: clamp(15px, 2.5vw, 19px); font-weight: 800; color: var(--text-main); letter-spacing: -0.3px; line-height: 1.2; }
+    .dash-nav-info p { font-size: 11.5px; color: var(--accent-cyan); font-weight: 700; }
+
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      white-space: nowrap;
+      transition: all 0.25s;
+    }
+    .btn-logout:hover { background: #ef4444; color: #fff; transform: translateY(-2px); box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+
+    /* Search Bar with Dynamic Placeholder */
+    .search-legend-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1 1 300px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--bg-surface);
+      border: 1.5px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    .search-box::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.08), rgba(255, 0, 127, 0.08), transparent);
+      animation: searchShimmer 4s infinite linear;
+      pointer-events: none;
+    }
+    @keyframes searchShimmer { 0% { left: -100%; } 100% { left: 100%; } }
+
+    .search-box:focus-within {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 25px var(--accent-glow);
+    }
+    .search-box i.search-icon {
+      position: absolute;
+      left: 18px;
+      color: var(--accent-cyan);
+      font-size: 18px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 16px 20px 16px 52px;
+      border-radius: 18px;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: clamp(13.5px, 2vw, 15px);
+      font-weight: 600;
+      outline: none;
+      position: relative;
+      z-index: 1;
+    }
+    .search-box input::placeholder { color: var(--text-sub); opacity: 0.85; }
+
+    .status-legend {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-surface);
+      padding: 10px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border-color);
+      font-size: 12px;
+      font-weight: 700;
+      backdrop-filter: blur(20px);
+      flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .dot-alert { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot-red { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+    .dot-yellow { background: #eab308; box-shadow: 0 0 10px #eab308; }
+    .dot-green { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+
+    /* Drawer */
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); z-index: 100; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+    .drawer-overlay.active { opacity: 1; visibility: visible; }
+    .drawer-panel { position: fixed; top: 0; left: -320px; width: min(300px, 85vw); height: 100vh; background: var(--drawer-bg); backdrop-filter: blur(40px); border-right: 1px solid var(--border-color); z-index: 101; padding: 24px 18px; display: flex; flex-direction: column; transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1); overflow-y: auto; }
+    .drawer-panel.active { left: 0; }
+    .drawer-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; }
+    .drawer-header h3 { font-size: 16px; color: var(--accent-cyan); font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .close-drawer { color: var(--text-sub); font-size: 20px; cursor: pointer; }
+    .category-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .category-item { padding: 12px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease; border: 1px solid transparent; }
+    .category-item:hover { background: rgba(0, 240, 255, 0.12); color: var(--accent-cyan); transform: translateX(6px); border-color: var(--border-color); }
+    .category-item.active { background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(157, 78, 221, 0.25)); color: var(--accent-cyan); border-color: var(--accent-cyan); }
+
+    .filter-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 12px 18px; background: linear-gradient(90deg, rgba(157, 78, 221, 0.15), rgba(0, 240, 255, 0.1)); border: 1px solid var(--border-color); border-radius: 16px; gap: 10px; flex-wrap: wrap; }
+    .filter-bar span { font-size: 13px; font-weight: 700; }
+    .btn-reset-filter { font-size: 12px; color: var(--accent-cyan); background: none; border: none; cursor: pointer; text-decoration: underline; font-weight: 800; }
+
+    /* Upload Panel */
+    .upload-panel {
+      background: var(--bg-surface);
+      backdrop-filter: blur(40px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: clamp(18px, 3vw, 28px);
+      margin-bottom: 30px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    }
+    .upload-panel h2 { font-size: clamp(15px, 2vw, 18px); margin-bottom: 18px; color: var(--accent-cyan); display: flex; align-items: center; gap: 8px; font-weight: 800; }
+    
+    .category-full-width-box {
+      width: 100%;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(157, 78, 221, 0.05));
+      border: 1.5px solid var(--border-color);
+      padding: 14px 18px;
+      border-radius: 16px;
+    }
+    .category-full-width-box label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: 8px;
+      color: var(--accent-cyan);
+      font-weight: 800;
+    }
+    .category-full-width-box select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      align-items: flex-end;
+    }
+    .form-group label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; color: var(--text-sub); font-weight: 800; }
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .input-wrapper i.field-icon { position: absolute; left: 14px; color: var(--accent-cyan); font-size: 14px; }
+    input[type="text"], input[type="date"], input[type="file"] { width: 100%; padding: 11px 14px 11px 38px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 13px; outline: none; }
+    input[type="file"] { padding: 9px 12px; font-size: 12px; }
+
+    .btn-neon {
+      padding: 12px 20px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple) 60%, var(--accent-pink));
+      background-size: 200% 200%;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      height: 42px;
+      transition: all 0.3s;
+    }
+    .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 6px 25px var(--accent-glow); }
+
+    .msg { padding: 10px 14px; border-radius: 12px; font-size: 13px; margin-bottom: 16px; display: none; align-items: center; gap: 8px; font-weight: 700; }
+    .msg.error { background: rgba(239, 68, 68, 0.18); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); display: flex; }
+    .msg.success { background: rgba(34, 197, 94, 0.18); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); display: flex; }
+
+    /* Document Grid & Cards */
+    .doc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+      gap: 20px;
+    }
+    .doc-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1.5px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .doc-card:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35); }
+    .doc-card.status-red { border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.25); }
+    .doc-card.status-yellow { border-color: #eab308; box-shadow: 0 0 20px rgba(234, 179, 8, 0.25); }
+    .doc-card.status-green { border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
+
+    .doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 8px; }
+    .doc-icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(157, 78, 221, 0.2));
+      color: var(--accent-cyan);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      border: 1px solid var(--border-color);
+    }
+    .doc-cat-tag { font-size: 11px; font-weight: 700; background: rgba(255, 255, 255, 0.08); padding: 4px 10px; border-radius: 8px; color: var(--text-sub); word-break: break-word; }
+    .doc-title { font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; word-break: break-word; }
+
+    .identity-box { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; background: rgba(0, 240, 255, 0.06); border: 1px dashed var(--border-color); padding: 10px 12px; border-radius: 12px; }
+    .identity-item { font-size: 12px; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+    .identity-item strong { color: var(--accent-cyan); font-weight: 800; }
+
+    .date-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .issue-date-badge { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 800; background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid #38bdf8; }
+    .validity-span-badge { display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 10px; font-size: 11.5px; font-weight: 700; background: rgba(234, 179, 8, 0.18); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .ai-date-badge { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 800; }
+    .badge-red { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-yellow { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .badge-green { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .badge-neutral { background: rgba(255, 255, 255, 0.05); color: var(--text-sub); border: 1px solid var(--border-color); }
+
+    .renewal-tip-box { font-size: 11.5px; color: var(--text-main); background: rgba(157, 78, 221, 0.14); padding: 8px 10px; border-radius: 10px; display: flex; align-items: flex-start; gap: 6px; border: 1px solid rgba(157, 78, 221, 0.35); line-height: 1.4; }
+    .loc-badge { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 12px; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+
+    .doc-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+    .btn-doc { flex: 1; padding: 10px 8px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 6px; border: none; transition: transform 0.2s ease; }
+    .btn-doc.preview { background: var(--accent-cyan); color: #000; }
+    .btn-doc.preview:hover { transform: translateY(-2px); }
+    .btn-doc.download { background: rgba(157, 78, 221, 0.25); color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-doc.download:hover { background: var(--accent-purple); color: #fff; transform: translateY(-2px); }
+    .btn-doc.delete { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); flex: 0.35; }
+    .btn-doc.delete:hover { background: #ef4444; color: #fff; }
+
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: var(--text-sub); background: var(--bg-surface); border-radius: 20px; border: 1px dashed var(--border-color); }
+
+    /* Modals */
+    .ai-modal-overlay, .preview-modal-overlay, .qr-modal-overlay { position: fixed; inset: 0; background: rgba(2, 1, 8, 0.94); backdrop-filter: blur(20px); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 16px; }
+    .ai-modal-overlay.active, .preview-modal-overlay.active, .qr-modal-overlay.active { display: flex; }
+
+    .ai-scan-box { width: 100%; max-width: 480px; background: var(--bg-card); border: 2px solid var(--accent-cyan); border-radius: 26px; padding: 36px 24px; text-align: center; box-shadow: 0 0 70px var(--accent-glow); }
+    .scanner-viewport { width: 140px; height: 140px; margin: 0 auto 20px; border: 2px dashed var(--accent-cyan); border-radius: 22px; position: relative; display: flex; justify-content: center; align-items: center; }
+    .scanner-viewport i { font-size: 58px; color: var(--accent-cyan); }
+    .laser-beam { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-pink), transparent); box-shadow: 0 0 20px var(--accent-cyan); animation: bigScanMovement 2s infinite alternate ease-in-out; }
+    @keyframes bigScanMovement { 0% { top: 5%; } 100% { top: 92%; } }
+    .ai-progress-track { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 6px; overflow: hidden; margin-top: 14px; }
+    .ai-progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink)); transition: width 0.4s ease; }
+
+    .preview-container { background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 22px; max-width: 900px; width: 100%; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
+    .preview-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+    .preview-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; justify-content: center; align-items: center; min-height: 380px; background: rgba(0, 0, 0, 0.3); }
+    .preview-body img { max-width: 100%; max-height: 70vh; border-radius: 12px; object-fit: contain; }
+    .preview-body iframe { width: 100%; height: 70vh; border: none; border-radius: 12px; }
+
+    .qr-modal-card { background: var(--bg-card); border: 2px solid var(--accent-cyan); border-radius: 24px; padding: 28px 20px; width: 100%; max-width: 400px; text-align: center; }
+    .qr-box-inner { background: #ffffff; padding: 14px; border-radius: 16px; display: inline-block; margin: 14px auto; }
+    .privacy-switch-container { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 240, 255, 0.08); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 14px; margin-bottom: 14px; text-align: left; }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; min-width: 44px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: rgba(255, 255, 255, 0.2); transition: .4s; border-radius: 34px; border: 1px solid var(--border-color); }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--accent-cyan); }
+    input:checked + .slider:before { transform: translateX(20px); background-color: #000; }
+
+    /* 🌐 PROFESSIONAL ULTRA FOOTER */
+    .vault-footer {
+      position: relative;
+      z-index: 2;
+      background: var(--bg-surface);
+      backdrop-filter: blur(40px);
+      border-top: 1px solid var(--border-color);
+      border-radius: 28px 28px 0 0;
+      margin-top: 40px;
+      padding: clamp(30px, 4vw, 50px) 20px 24px;
+      box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.4);
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1.5fr 1fr;
+      gap: clamp(20px, 3vw, 36px);
+      margin-bottom: 30px;
+    }
+    .footer-col h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-col p { font-size: 12.5px; color: var(--text-sub); line-height: 1.6; margin-bottom: 10px; }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 8px; }
+    .footer-col ul li a { color: var(--text-sub); font-size: 12.5px; text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .footer-col ul li a:hover { color: var(--accent-cyan); transform: translateX(3px); }
+
+    .contact-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; font-size: 12.5px; color: var(--text-sub); line-height: 1.4; }
+    .contact-item i { color: var(--accent-cyan); font-size: 14px; margin-top: 2px; }
+    .contact-item a { color: var(--text-main); text-decoration: none; font-weight: 600; word-break: break-all; }
+    .contact-item a:hover { color: var(--accent-cyan); text-decoration: underline; }
+
+    .social-links { display: flex; gap: 10px; margin-top: 12px; }
+    .social-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: var(--accent-cyan);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+    .social-btn:hover { transform: translateY(-3px); background: var(--accent-cyan); color: #000; box-shadow: 0 0 20px var(--accent-cyan); }
+    .social-btn.insta:hover { background: #e1306c; color: #fff; box-shadow: 0 0 20px #e1306c; }
+    .social-btn.fb:hover { background: #1877f2; color: #fff; box-shadow: 0 0 20px #1877f2; }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+    .host-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: 8px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .host-badge:hover { background: var(--accent-cyan); color: #000; }
+
+    @media (max-width: 900px) {
+      .footer-content { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .footer-content { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bgCanvas"></canvas>
+  <div class="cyber-grid-floor"></div>
+
+  <div class="aurora-layer">
+    <div class="aurora-orb orb-cyan"></div>
+    <div class="aurora-orb orb-purple"></div>
+    <div class="aurora-orb orb-pink"></div>
+  </div>
+
+  <!-- QR Code Modal -->
+  <div class="qr-modal-overlay" id="qrModal" onclick="closeQRModal(event)">
+    <div class="qr-modal-card" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="color: var(--accent-cyan); font-weight: 800; font-size: 17px;"><i class="fa-solid fa-qrcode"></i> Vault Profile QR</h3>
+        <i class="fa-solid fa-xmark" style="color: var(--text-sub); cursor: pointer;" onclick="closeQRModal()"></i>
+      </div>
+      
+      <div class="privacy-switch-container">
+        <div style="text-align: left;">
+          <h5 id="privacyStateTitle" style="font-size: 13px; font-weight: 800; color: var(--text-main);"><i class="fa-solid fa-lock" style="color: #00f0ff;"></i> Password Protected</h5>
+          <p id="privacyStateDesc" style="font-size: 11px; color: var(--text-sub);">Ask for password when scanned</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="qrPrivacyToggle" onchange="handlePrivacyToggle(this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="qr-box-inner" id="qrcode"></div>
+      <div style="font-size: 11.5px; color: var(--accent-cyan); font-weight: 700; margin-bottom: 14px; word-break: break-all;" id="qrLinkText"></div>
+      <button class="btn-neon" style="width: 100%;" onclick="window.print()"><i class="fa-solid fa-print"></i> Print / Save QR Code</button>
+    </div>
+  </div>
+
+  <!-- AI Scanning Overlay -->
+  <div class="ai-modal-overlay" id="aiModal">
+    <div class="ai-scan-box">
+      <div class="scanner-viewport">
+        <div class="laser-beam"></div>
+        <i class="fa-solid fa-brain"></i>
+      </div>
+      <h3 style="font-size: 19px; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">Gemini Neural Vision</h3>
+      <div style="font-size: 13px; color: var(--accent-cyan); font-weight: 700;" id="aiStepText">Extracting Owner, Document Type & Dates...</div>
+      <div class="ai-progress-track">
+        <div class="ai-progress-bar" id="aiProgress"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div class="preview-modal-overlay" id="previewModal" onclick="closePreview(event)">
+    <div class="preview-container" onclick="event.stopPropagation()">
+      <div class="preview-header">
+        <h3 id="previewTitle" style="font-size: 16px; color: var(--accent-cyan); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-eye"></i> Document Preview</h3>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <a href="#" id="modalDownloadBtn" download style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); color: white; text-decoration: none; font-size: 12px; font-weight: 800; padding: 7px 14px; border-radius: 10px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-download"></i> Download
+          </a>
+          <i class="fa-solid fa-xmark" style="color: var(--text-sub); font-size: 20px; cursor: pointer;" onclick="closePreview()"></i>
+        </div>
+      </div>
+      <div class="preview-body" id="previewBody"></div>
+    </div>
+  </div>
+
+  <!-- Categories Drawer -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+  <div class="drawer-panel" id="drawerPanel">
+    <div class="drawer-header">
+      <h3><i class="fa-solid fa-list-ul"></i> Categories</h3>
+      <i class="fa-solid fa-xmark close-drawer" onclick="toggleDrawer()"></i>
+    </div>
+    <ul class="category-list">
+      <li class="category-item active" onclick="filterCategory('ALL', this)"><span>🌟</span> All Categories</li>
+      <li class="category-item" onclick="filterCategory('📄 Documents & certificates', this)"><span>📄</span> Documents & certificates</li>
+      <li class="category-item" onclick="filterCategory('🧾 Bills & warranties', this)"><span>🧾</span> Bills & warranties</li>
+      <li class="category-item" onclick="filterCategory('🔧 Home appliances', this)"><span>🔧</span> Home appliances</li>
+      <li class="category-item" onclick="filterCategory('📦 Stored items', this)"><span>📦</span> Stored items</li>
+      <li class="category-item" onclick="filterCategory('📅 Important dates', this)"><span>📅</span> Important dates</li>
+      <li class="category-item" onclick="filterCategory('🎓 Education records', this)"><span>🎓</span> Education records</li>
+      <li class="category-item" onclick="filterCategory('👨‍👩‍👧 Family-related information', this)"><span>👨‍👩‍👧</span> Family-related info</li>
+      <li class="category-item" onclick="filterCategory('📝 Personal notes', this)"><span>📝</span> Personal notes</li>
+    </ul>
+  </div>
+
+  <div class="dash-wrapper">
+    <!-- Navbar -->
+    <header class="dash-nav">
+      <div class="nav-left">
+        <button class="drawer-btn" onclick="toggleDrawer()" aria-label="Open Categories Menu">
+          <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+        <div class="dash-nav-info">
+          <h1><span id="userName">User</span>'s Vault</h1>
+          <p>UID: <span id="userId">...</span></p>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button class="qr-btn" onclick="openQRModal()" aria-label="Generate Vault QR Code" title="Share Vault QR">
+          <i class="fa-solid fa-qrcode"></i>
+        </button>
+        <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Switch Light Dark Theme" title="Theme Toggle">
+          <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+        <button class="btn-logout" onclick="logout()">
+          <i class="fa-solid fa-power-off"></i> Disconnect
+        </button>
+      </div>
+    </header>
+
+    <!-- Search Bar with Live Typewriter -->
+    <section class="search-legend-bar" aria-label="Vault Search">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Search Vault..." oninput="handleSearch()" aria-label="Search records">
+      </div>
+      <div class="status-legend">
+        <div class="legend-item"><span class="dot-alert dot-red"></span> Expired / Due</div>
+        <div class="legend-item"><span class="dot-alert dot-yellow"></span> &lt;30 Days</div>
+        <div class="legend-item"><span class="dot-alert dot-green"></span> Valid / Safe</div>
+      </div>
+    </section>
+
+    <div class="filter-bar" id="filterBar">
+      <span>Active View: <strong id="currentCategoryText" style="color: var(--accent-cyan);">All Categories</strong></span>
+      <button class="btn-reset-filter" onclick="filterCategory('ALL', document.querySelector('.category-item'))">Show All</button>
+    </div>
+
+    <!-- Upload Panel -->
+    <section class="upload-panel" aria-label="Add Document">
+      <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Smart Vault Scanner</h2>
+      <div id="uploadMsg" class="msg"></div>
+      
+      <form id="uploadDocForm" onsubmit="handleUpload(event)">
+        <div class="category-full-width-box">
+          <label><i class="fa-solid fa-layer-group"></i> Choose Document Category</label>
+          <div class="input-wrapper">
+            <select id="docCategory" onchange="adjustFormFields()" required>
+              <option value="📄 Documents & certificates">📄 Documents & certificates (Caste, Income, Passport)</option>
+              <option value="🧾 Bills & warranties">🧾 Bills & warranties (Invoices, Gadget Bills)</option>
+              <option value="🔧 Home appliances">🔧 Home appliances (Fridge, AC, Geyser, TV)</option>
+              <option value="📦 Stored items">📦 Stored items (Physical items kept at home)</option>
+              <option value="📅 Important dates">📅 Important dates (Renewals, Due dates, Birthdays)</option>
+              <option value="🎓 Education records">🎓 Education records (Degrees, Marksheets)</option>
+              <option value="👨‍👩‍👧 Family-related information">👨‍👩‍👧 Family-related info (Medical, Insurance)</option>
+              <option value="📝 Personal notes">📝 Personal notes (Quick notes, Locker Passwords)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="upload-grid" id="dynamicFieldsContainer"></div>
+      </form>
+    </section>
+
+    <div style="font-size: 18px; margin-bottom: 18px; color: var(--text-main); font-weight: 800;">
+      Stored Records (<span id="docCount">0</span>)
+    </div>
+    <main class="doc-grid" id="docContainer"></main>
+  </div>
+
+  <!-- 🌐 ULTRA FUTURISTIC FOOTER -->
+  <footer class="vault-footer">
+    <div class="footer-content">
+      <!-- Col 1: About & Purpose -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-shield-halved"></i> Vortex Vault</h4>
+        <p>
+          Vortex Vault is a decentralized, neural-powered document management hub designed to eliminate paperwork chaos. Hosted natively on <strong>markiv.site</strong>, our goal is to empower individuals and families to securely digitize certificates, track warranty expiries, manage physical home storages, and retrieve records instantly using biometric-grade QR access.
+        </p>
+        <p style="color: var(--accent-cyan); font-weight: 700; font-size: 12px;">
+          🚀 Mission: Zero Lost Documents, Seamless Lifecycle Tracking & Instant Access.
+        </p>
+      </div>
+
+      <!-- Col 2: Quick Vault Views -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-compass"></i> Ecosystem</h4>
+        <ul>
+          <li><a href="javascript:void(0)" onclick="filterCategory('ALL', document.querySelector('.category-item'))"><i class="fa-solid fa-layer-group"></i> All Vault Records</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCategory('📄 Documents & certificates', null)"><i class="fa-solid fa-file-shield"></i> Certificates</a></li>
+          <li><a href="javascript:void(0)" onclick="filterCategory('🧾 Bills & warranties', null)"><i class="fa-solid fa-receipt"></i> Warranty Tracker</a></li>
+          <li><a href="javascript:void(0)" onclick="openQRModal()"><i class="fa-solid fa-qrcode"></i> Instant QR Share</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Direct Contact Details -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-headset"></i> Contact Us</h4>
+        <div class="contact-item">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>Modinagar, Ghaziabad, Uttar Pradesh (UP), India</span>
+        </div>
+        <div class="contact-item">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:+917309929051">+91 73099 29051</a>
+        </div>
+        <div class="contact-item">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:vikram.2872006@gmail.com">vikram.2872006@gmail.com</a>
+        </div>
+        <div class="contact-item">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <a href="mailto:vikram_cse_2024@rkgitm.ac.in">vikram_cse_2024@rkgitm.ac.in</a>
+        </div>
+      </div>
+
+      <!-- Col 4: Social Channels & Platform -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-share-nodes"></i> Connect</h4>
+        <p>Follow our platform updates or reach out directly across channels:</p>
+        <div class="social-links">
+          <a href="https://markiv.site" target="_blank" rel="noopener" class="social-btn" title="Official Web Portal">
+            <i class="fa-solid fa-globe"></i>
+          </a>
+          <a href="https://www.instagram.com/vikrm_bhardwaj?igsh=OWh4ZHprbW5rNTZv" target="_blank" rel="noopener" class="social-btn insta" title="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="https://www.facebook.com/share/196jZuggxg/" target="_blank" rel="noopener" class="social-btn fb" title="Facebook">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Copyright & Platform Bar -->
+    <div class="footer-bottom">
+      <div>
+        &copy; 2026 <strong>Vortex Vault</strong>. All rights reserved. Crafted by Vikram.
+      </div>
+      <div>
+        <a href="https://markiv.site" target="_blank" rel="noopener" class="host-badge">
+          <i class="fa-solid fa-server"></i> Deployed on markiv.site
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const token = localStorage.getItem("vaultToken");
+    let user = JSON.parse(localStorage.getItem("vaultUser") || "null");
+
+    let allDocuments = [];
+    let selectedCategory = "ALL";
+    let searchQuery = "";
+
+    // 📱 QR Code Generation
+    function openQRModal() {
+      const modal = document.getElementById("qrModal");
+      const qrContainer = document.getElementById("qrcode");
+      const toggle = document.getElementById("qrPrivacyToggle");
+      qrContainer.innerHTML = "";
+
+      const isLocked = user && user.isQrLocked !== undefined ? user.isQrLocked : true;
+      toggle.checked = isLocked;
+      updatePrivacyUI(isLocked);
+
+      const unlockUrl = `${API_BASE}/unlock.html?u=${encodeURIComponent(user.customUserId)}`;
+      document.getElementById("qrLinkText").innerText = unlockUrl;
+
+      new QRCode(qrContainer, {
+        text: unlockUrl,
+        width: 170,
+        height: 170,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      modal.classList.add("active");
+    }
+
+    function updatePrivacyUI(isLocked) {
+      const title = document.getElementById("privacyStateTitle");
+      const desc = document.getElementById("privacyStateDesc");
+      if (isLocked) {
+        title.innerHTML = `<i class="fa-solid fa-lock" style="color: #00f0ff;"></i> Password Protected`;
+        desc.innerText = "Ask for password when scanned (Private)";
+      } else {
+        title.innerHTML = `<i class="fa-solid fa-lock-open" style="color: #22c55e;"></i> Direct Public Access`;
+        desc.innerText = "Opens vault directly without password (Public)";
+      }
+    }
+
+    async function handlePrivacyToggle(isChecked) {
+      updatePrivacyUI(isChecked);
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/update-qr-privacy`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ isQrLocked: isChecked })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          user.isQrLocked = data.isQrLocked;
+          localStorage.setItem("vaultUser", JSON.stringify(user));
+        }
+      } catch (err) {
+        console.error("Privacy update error:", err);
+      }
+    }
+
+    function closeQRModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains("close-drawer")) return;
+      document.getElementById("qrModal").classList.remove("active");
+    }
+
+    // Typewriter Search Placeholder
+    const searchInput = document.getElementById("searchInput");
+    const searchPlaceholders = [
+      "Search Caste Certificate...",
+      "Search Income Certificate...",
+      "Search Voltas AC Warranty Bill...",
+      "Search Car Insurance Renewal Date...",
+      "Search Passport / Driving License...",
+      "Search by Owner Name...",
+      "Search Storage Location..."
+    ];
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typewriterTimer = null;
+
+    function typeEffect() {
+      if (searchInput === document.activeElement && searchInput.value.length > 0) {
+        typewriterTimer = setTimeout(typeEffect, 1000);
+        return;
+      }
+      const currentPhrase = searchPlaceholders[phraseIndex];
+      if (isDeleting) {
+        searchInput.setAttribute("placeholder", currentPhrase.substring(0, charIndex - 1));
+        charIndex--;
+      } else {
+        searchInput.setAttribute("placeholder", currentPhrase.substring(0, charIndex + 1));
+        charIndex++;
+      }
+      let typingSpeed = isDeleting ? 35 : 75;
+      if (!isDeleting && charIndex === currentPhrase.length) {
+        typingSpeed = 1800;
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        phraseIndex = (phraseIndex + 1) % searchPlaceholders.length;
+        typingSpeed = 400;
+      }
+      typewriterTimer = setTimeout(typeEffect, typingSpeed);
+    }
+    typeEffect();
+
+    // Canvas Background Animation
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.radius = Math.random() * 1.5 + 1;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+        if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+      }
+      draw(theme) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = theme === "dark" ? "rgba(0, 240, 255, 0.45)" : "rgba(99, 102, 241, 0.4)";
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.min(Math.floor((canvas.width * canvas.height) / 18000), 60);
+      for (let i = 0; i < count; i++) particles.push(new Particle());
+    }
+    initParticles();
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const theme = document.documentElement.getAttribute("data-theme") || "dark";
+      const lineColor = theme === "dark" ? "rgba(0, 240, 255, 0.08)" : "rgba(99, 102, 241, 0.08)";
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw(theme);
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 1 - dist / 120;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // Theme Toggle
+    function initTheme() {
+      const savedTheme = localStorage.getItem("vaultTheme") || "dark";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      const targetTheme = currentTheme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", targetTheme);
+      localStorage.setItem("vaultTheme", targetTheme);
+      updateThemeIcon(targetTheme);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById("themeIcon");
+      if (theme === "dark") {
+        icon.className = "fa-solid fa-sun";
+      } else {
+        icon.className = "fa-solid fa-moon";
+      }
+    }
+    initTheme();
+
+    if (!token || !user) {
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("userName").innerText = user.name || "User";
+      document.getElementById("userId").innerText = user.customUserId || "";
+    }
+
+    function adjustFormFields() {
+      const cat = document.getElementById("docCategory").value;
+      const container = document.getElementById("dynamicFieldsContainer");
+
+      if (cat.includes("Important dates")) {
+        container.innerHTML = `
+          <div class="form-group">
+            <label>Event / Due Date Title</label>
+            <div class="input-wrapper"><i class="fa-solid fa-bell field-icon"></i><input type="text" id="docTitle" required placeholder="e.g. Car Insurance Renewal"></div>
+          </div>
+          <div class="form-group">
+            <label>Target Date</label>
+            <div class="input-wrapper"><i class="fa-solid fa-calendar-day field-icon"></i><input type="date" id="docDateInput" required></div>
+          </div>
+          <div class="form-group">
+            <label>Reminder Notes / Details</label>
+            <div class="input-wrapper"><i class="fa-solid fa-pen-to-square field-icon"></i><input type="text" id="docLocation" required placeholder="e.g. Policy No: 98127"></div>
+          </div>
+          <div class="form-group">
+            <label>Optional Photo / Bill</label><input type="file" id="docFile" accept="image/*,application/pdf">
+          </div>
+          <button type="submit" class="btn-neon"><i class="fa-solid fa-calendar-plus"></i> Save Date</button>
+        `;
+      } else if (cat.includes("Personal notes")) {
+        container.innerHTML = `
+          <div class="form-group">
+            <label>Note Subject</label>
+            <div class="input-wrapper"><i class="fa-solid fa-heading field-icon"></i><input type="text" id="docTitle" required placeholder="e.g. Locker Key Location"></div>
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label>Write Note</label>
+            <div class="input-wrapper"><i class="fa-solid fa-file-lines field-icon"></i><input type="text" id="docLocation" required placeholder="e.g. Key is hidden behind the clock"></div>
+          </div>
+          <div class="form-group">
+            <label>Optional Image</label><input type="file" id="docFile" accept="image/*,application/pdf">
+          </div>
+          <button type="submit" class="btn-neon"><i class="fa-solid fa-floppy-disk"></i> Save Note</button>
+        `;
+      } else if (cat.includes("Stored items")) {
+        container.innerHTML = `
+          <div class="form-group">
+            <label>Item Name</label>
+            <div class="input-wrapper"><i class="fa-solid fa-box-open field-icon"></i><input type="text" id="docTitle" required placeholder="e.g. Winter Blankets"></div>
+          </div>
+          <div class="form-group">
+            <label>Storage Place at Home</label>
+            <div class="input-wrapper"><i class="fa-solid fa-location-dot field-icon"></i><input type="text" id="docLocation" required placeholder="e.g. Bed Box Room 2"></div>
+          </div>
+          <div class="form-group">
+            <label>Attach Photo (Optional)</label><input type="file" id="docFile" accept="image/*,application/pdf">
+          </div>
+          <button type="submit" class="btn-neon"><i class="fa-solid fa-box-archive"></i> Save Item</button>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="form-group">
+            <label>Document / Item Label</label>
+            <div class="input-wrapper"><i class="fa-solid fa-signature field-icon"></i><input type="text" id="docTitle" required placeholder="e.g. Caste / Income Certificate, AC Bill"></div>
+          </div>
+          <div class="form-group">
+            <label>Physical Storage Place</label>
+            <div class="input-wrapper"><i class="fa-solid fa-location-dot field-icon"></i><input type="text" id="docLocation" required placeholder="e.g. Blue File, Locker 1"></div>
+          </div>
+          <div class="form-group">
+            <label>Upload Document / Bill (AI Scans All)</label>
+            <input type="file" id="docFile" required accept="image/*,application/pdf">
+          </div>
+          <button type="submit" class="btn-neon"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Scan & Save</button>
+        `;
+      }
+    }
+    adjustFormFields();
+
+    function toggleDrawer() {
+      document.getElementById("drawerOverlay").classList.toggle("active");
+      document.getElementById("drawerPanel").classList.toggle("active");
+    }
+
+    function filterCategory(cat, element) {
+      selectedCategory = cat;
+      document.querySelectorAll(".category-item").forEach(item => item.classList.remove("active"));
+      if (element) element.classList.add("active");
+
+      document.getElementById("currentCategoryText").innerText = cat === "ALL" ? "All Categories" : cat;
+      renderDocuments();
+      
+      document.getElementById("drawerOverlay").classList.remove("active");
+      document.getElementById("drawerPanel").classList.remove("active");
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById("searchInput").value.toLowerCase().trim();
+      renderDocuments();
+    }
+
+    function logout() {
+      localStorage.removeItem("vaultToken");
+      localStorage.removeItem("vaultUser");
+      window.location.href = "index.html";
+    }
+
+    function showMsg(text, isError = false) {
+      const msg = document.getElementById("uploadMsg");
+      msg.className = "msg " + (isError ? "error" : "success");
+      msg.innerHTML = `<i class="fa-solid ${isError ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i> ${text}`;
+      msg.style.display = "flex";
+      setTimeout(() => msg.style.display = "none", 5000);
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return null;
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return null;
+      return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    }
+
+    function getDateStatus(dateString) {
+      if (!dateString) return { status: "status-neutral", badgeClass: "badge-neutral", text: "Lifelong / Permanent" };
+      const targetDate = new Date(dateString);
+      if (isNaN(targetDate.getTime())) return { status: "status-neutral", badgeClass: "badge-neutral", text: "Lifelong / Permanent" };
+
+      const today = new Date();
+      const diffTime = targetDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const formatted = formatDate(dateString);
+
+      if (diffDays < 0) {
+        return { status: "status-red", badgeClass: "badge-red", text: `Expired on ${formatted} (${Math.abs(diffDays)}d ago)` };
+      } else if (diffDays <= 7) {
+        return { status: "status-red", badgeClass: "badge-red", text: `Due in ${diffDays} day(s) - ${formatted}` };
+      } else if (diffDays <= 30) {
+        return { status: "status-yellow", badgeClass: "badge-yellow", text: `Due Soon: ${formatted} (${diffDays}d left)` };
+      } else {
+        return { status: "status-green", badgeClass: "badge-green", text: `Valid until: ${formatted}` };
+      }
+    }
+
+    function openPreview(url, title, fileType, originalName) {
+      const modal = document.getElementById("previewModal");
+      const body = document.getElementById("previewBody");
+      const downloadBtn = document.getElementById("modalDownloadBtn");
+
+      document.getElementById("previewTitle").innerHTML = `<i class="fa-solid fa-file-lines"></i> ${title}`;
+      downloadBtn.href = url;
+      downloadBtn.setAttribute("download", originalName || title);
+
+      if (fileType && fileType.includes("pdf")) {
+        body.innerHTML = `<iframe src="${url}"></iframe>`;
+      } else {
+        body.innerHTML = `<img src="${url}" alt="${title}">`;
+      }
+      modal.classList.add("active");
+    }
+
+    function closePreview(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains("close-drawer")) return;
+      document.getElementById("previewModal").classList.remove("active");
+      document.getElementById("previewBody").innerHTML = "";
+    }
+
+    async function loadDocuments() {
+      try {
+        const res = await fetch(`${API_BASE}/api/documents`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          allDocuments = data.documents || [];
+          renderDocuments();
+        }
+      } catch (err) {
+        console.error("Fetch Error:", err);
+      }
+    }
+
+    function renderDocuments() {
+      const container = document.getElementById("docContainer");
+
+      let filtered = allDocuments.filter(doc => {
+        const matchesCategory = (selectedCategory === "ALL" || doc.category === selectedCategory);
+        const matchesSearch = !searchQuery || 
+          (doc.title && doc.title.toLowerCase().includes(searchQuery)) ||
+          (doc.personName && doc.personName.toLowerCase().includes(searchQuery)) ||
+          (doc.documentType && doc.documentType.toLowerCase().includes(searchQuery)) ||
+          (doc.physicalLocation && doc.physicalLocation.toLowerCase().includes(searchQuery)) ||
+          (doc.category && doc.category.toLowerCase().includes(searchQuery));
+
+        return matchesCategory && matchesSearch;
+      });
+
+      document.getElementById("docCount").innerText = filtered.length;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-box-archive" style="font-size: 38px; margin-bottom: 8px;"></i>
+            <h3 style="margin-bottom: 6px;">No records found</h3>
+            <p>Upload a document or select another category.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(doc => {
+        const isPdf = doc.fileType && doc.fileType.includes("pdf");
+        let icon = isPdf ? "fa-file-pdf" : "fa-file-lines";
+        if (doc.category.includes("Important dates")) icon = "fa-calendar-check";
+        if (doc.category.includes("Stored items")) icon = "fa-box";
+        if (doc.category.includes("Personal notes")) icon = "fa-note-sticky";
+        if (doc.category.includes("Home appliances")) icon = "fa-tv";
+
+        const expiryMeta = getDateStatus(doc.importantDate);
+        const formattedIssue = formatDate(doc.issueDate);
+        const hasFile = doc.fileUrl && doc.fileUrl !== "/uploads/no-file";
+
+        return `
+          <article class="doc-card ${expiryMeta.status}">
+            <div>
+              <div class="doc-header">
+                <div class="doc-icon"><i class="fa-solid ${icon}"></i></div>
+                <span class="doc-cat-tag">${doc.category || 'General'}</span>
+              </div>
+              <h3 class="doc-title">${doc.title}</h3>
+              
+              ${(doc.personName || doc.documentType) ? `
+                <div class="identity-box">
+                  ${doc.documentType ? `<div class="identity-item"><i class="fa-solid fa-file-shield" style="color:var(--accent-cyan);"></i> <span><strong>Type:</strong> ${doc.documentType}</span></div>` : ''}
+                  ${doc.personName ? `<div class="identity-item"><i class="fa-solid fa-user-check" style="color:var(--accent-purple);"></i> <span><strong>Owner:</strong> ${doc.personName}</span></div>` : ''}
+                </div>
+              ` : ''}
+
+              <div class="date-container">
+                ${formattedIssue ? `
+                  <div class="issue-date-badge">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span><strong>Issued:</strong> ${formattedIssue}</span>
+                  </div>
+                ` : ''}
+
+                ${doc.validitySpan ? `
+                  <div class="validity-span-badge">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                    <span><strong>Lifespan:</strong> ${doc.validitySpan}</span>
+                  </div>
+                ` : ''}
+
+                <div class="ai-date-badge ${expiryMeta.badgeClass}">
+                  <i class="fa-regular fa-clock"></i>
+                  <span>${expiryMeta.text}</span>
+                </div>
+
+                ${doc.renewalTip ? `
+                  <div class="renewal-tip-box">
+                    <i class="fa-solid fa-circle-info" style="color:var(--accent-cyan); margin-top:2px;"></i>
+                    <span>${doc.renewalTip}</span>
+                  </div>
+                ` : ''}
+              </div>
+
+              <div class="loc-badge">
+                <i class="fa-solid fa-location-dot" style="color:var(--accent-cyan);"></i>
+                <span><strong>Details/Place:</strong> ${doc.physicalLocation}</span>
+              </div>
+            </div>
+
+            <div class="doc-actions">
+              ${hasFile ? `
+                <button onclick="openPreview('${doc.fileUrl}', '${doc.title.replace(/'/g, "\\'")}', '${doc.fileType}', '${(doc.fileOriginalName || doc.title).replace(/'/g, "\\'")}')" class="btn-doc preview">
+                  <i class="fa-solid fa-eye"></i> Preview
+                </button>
+                <a href="${doc.fileUrl}" download="${doc.fileOriginalName || doc.title}" class="btn-doc download" title="Direct Download">
+                  <i class="fa-solid fa-download"></i> Download
+                </a>
+              ` : `
+                <div style="font-size:11.5px; color:var(--text-sub); padding:8px 0; text-align:center; flex:1;">No attachment</div>
+              `}
+              <button onclick="deleteDoc('${doc._id}')" class="btn-doc delete" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    loadDocuments();
+
+    async function handleUpload(e) {
+      e.preventDefault();
+
+      const category = document.getElementById("docCategory").value;
+      const title = document.getElementById("docTitle").value;
+      const physicalLocation = document.getElementById("docLocation").value;
+      const dateInput = document.getElementById("docDateInput");
+      const fileInput = document.getElementById("docFile");
+      const file = fileInput ? fileInput.files[0] : null;
+
+      const fd = new FormData();
+      fd.append("category", category);
+      fd.append("title", title);
+      fd.append("physicalLocation", physicalLocation);
+      if (dateInput && dateInput.value) fd.append("manualDate", dateInput.value);
+      if (file) fd.append("docFile", file);
+
+      const modal = document.getElementById("aiModal");
+      const stepText = document.getElementById("aiStepText");
+      const progressBar = document.getElementById("aiProgress");
+      
+      if (file) {
+        modal.classList.add("active");
+        progressBar.style.width = "40%";
+        stepText.innerText = "Gemini OCR Identifying Owner, Type & Dates...";
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/documents/upload`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd
+        });
+        const data = await res.json();
+
+        if (file) {
+          progressBar.style.width = "100%";
+          stepText.innerText = "Complete!";
+        }
+
+        setTimeout(() => {
+          modal.classList.remove("active");
+          if (res.ok) {
+            showMsg("Item saved to Vault successfully!");
+            document.getElementById("uploadDocForm").reset();
+            adjustFormFields();
+            loadDocuments();
+          } else {
+            showMsg(data.error || "Upload failed.", true);
+          }
+        }, file ? 500 : 50);
+
+      } catch (err) {
+        modal.classList.remove("active");
+        showMsg("Server connection error.", true);
+      }
+    }
+
+    async function deleteDoc(id) {
+      if (!confirm("Delete this record?")) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/documents/${id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) loadDocuments();
+        else alert("Delete failed.");
+      } catch (err) {
+        alert("Delete failed.");
+      }
+    }
+  </script>
+</body>
+</html>

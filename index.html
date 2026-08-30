@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  
+  <!-- 🚀 SEO Meta Tags for Google Ranking (#1 Target: markiv, markiv.site, vortex vault) -->
+  <title>VortexAuth | Decentralized Neural Access Portal | markiv.site</title>
+  <meta name="description" content="Official login and registration portal for Vortex Vault on markiv.site. Secure, AI-protected document storage with automated recovery and multi-factor security.">
+  <meta name="keywords" content="Vortex Vault, markiv, markiv.site, VortexAuth, secure login, AI vault portal, Vikram Bhardwaj, cloud locker access">
+  <meta name="author" content="Vikram">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://markiv.site">
+
+  <!-- 🌐 Social / Open Graph Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://markiv.site">
+  <meta property="og:title" content="VortexAuth - Neural Identity Access Portal">
+  <meta property="og:description" content="Secure login and biometric-grade identity access for Vortex Vault.">
+  <meta property="og:site_name" content="Vortex Vault on markiv.site">
+
+  <!-- 🔍 Google JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "VortexAuth Portal",
+    "url": "https://markiv.site",
+    "description": "Secure authentication portal for Vortex Vault on markiv.site.",
+    "author": {
+      "@type": "Person",
+      "name": "Vikram",
+      "email": "vikram.2872006@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Modinagar",
+        "addressRegion": "Uttar Pradesh",
+        "addressCountry": "IN"
+      }
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #020008;
+      --bg-surface: rgba(13, 8, 30, 0.8);
+      --bg-card: rgba(18, 10, 42, 0.9);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-color: rgba(0, 240, 255, 0.3);
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --accent-pink: #ff007f;
+      --accent-glow: rgba(0, 240, 255, 0.4);
+      --input-bg: rgba(6, 2, 16, 0.85);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background: var(--bg-main);
+      min-height: 100vh;
+      color: var(--text-main);
+      overflow-x: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .aurora-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .aurora-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.5; animation: floatNebula 12s infinite alternate ease-in-out; }
+    .orb-cyan { width: min(550px, 90vw); height: min(550px, 90vw); background: radial-gradient(circle, #00f0ff 0%, transparent 70%); top: -15%; left: -10%; }
+    .orb-purple { width: min(600px, 90vw); height: min(600px, 90vw); background: radial-gradient(circle, #7000ff 0%, transparent 70%); bottom: -15%; right: -10%; animation-duration: 9s; }
+    .orb-pink { width: min(420px, 70vw); height: min(420px, 70vw); background: radial-gradient(circle, #ff0077 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); animation: pulseCore 7s infinite alternate ease-in-out; }
+
+    @keyframes floatNebula { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-40px, 70px) scale(0.95); } }
+    @keyframes pulseCore { 0% { opacity: 0.25; transform: translate(-50%, -50%) scale(0.85); } 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); } }
+
+    #vortexCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+
+    /* Page Container */
+    .portal-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      min-height: calc(100vh - 120px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(20px, 4vw, 40px) 16px;
+      perspective: 1200px;
+    }
+
+    .glow-conduit {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 440px;
+      padding: 2px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #00f0ff, #7000ff 40%, #ff0077 75%, #00f0ff);
+      background-size: 300% 300%;
+      animation: neonStream 7s ease infinite;
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.45), 0 0 70px rgba(112, 0, 255, 0.3), 0 30px 60px rgba(0, 0, 0, 0.95);
+      transition: transform 0.15s ease-out;
+    }
+    @keyframes neonStream { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+    .auth-card {
+      background: rgba(8, 4, 18, 0.88);
+      backdrop-filter: blur(30px);
+      border-radius: 24px;
+      padding: clamp(24px, 4vw, 36px) clamp(18px, 3vw, 28px);
+    }
+    
+    .brand-header { text-align: center; margin-bottom: 20px; }
+    .brand-icon-box {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 10px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 119, 0.2));
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      color: #00f0ff;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
+    }
+    .brand-header h1 {
+      font-size: clamp(20px, 3vw, 24px);
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff, #00f0ff);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-header p { color: #94a3b8; font-size: 12.5px; margin-top: 4px; }
+
+    .tabs { display: flex; background: rgba(255, 255, 255, 0.03); padding: 4px; border-radius: 14px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.08); }
+    .tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; color: #94a3b8; font-size: 13px; font-weight: 700; border-radius: 10px; transition: all 0.3s ease; }
+    .tab.active { background: linear-gradient(135deg, #00f0ff, #7000ff); color: #ffffff; box-shadow: 0 4px 18px rgba(0, 240, 255, 0.4); }
+
+    .form-group { margin-bottom: 14px; text-align: left; }
+    label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; color: #cbd5e1; font-weight: 700; }
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .input-wrapper i.field-icon { position: absolute; left: 14px; color: #64748b; font-size: 14px; pointer-events: none; }
+    
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      padding: 12px 40px 12px 38px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+    select { cursor: pointer; padding-right: 14px; }
+    select option { background: #0b0518; color: #fff; }
+    input:focus, select:focus { border-color: #00f0ff; background: rgba(0, 0, 0, 0.8); box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
+    
+    .toggle-password { position: absolute; right: 14px; color: #64748b; cursor: pointer; font-size: 14px; z-index: 2; }
+    .toggle-password:hover { color: #00f0ff; }
+
+    .forgot-link { font-size: 12px; color: #00f0ff; text-align: right; margin-top: -4px; margin-bottom: 14px; cursor: pointer; font-weight: 600; display: block; }
+    .forgot-link:hover { text-decoration: underline; }
+
+    .btn-neon {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #00f0ff, #7000ff 60%, #ff0077);
+      background-size: 200% 200%;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 25px rgba(0, 240, 255, 0.4);
+      transition: all 0.3s ease;
+    }
+    .btn-neon:hover { background-position: 100% 50%; box-shadow: 0 6px 30px rgba(255, 0, 119, 0.5); transform: translateY(-2px); }
+
+    .msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; margin-bottom: 14px; display: none; align-items: center; gap: 8px; font-weight: 600; }
+    .msg.error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); display: flex; }
+    .msg.success { background: rgba(34, 197, 94, 0.15); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.3); display: flex; }
+
+    /* 🤖 Chatbot Launcher Widget */
+    .chatbot-launcher {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 999;
+      background: linear-gradient(135deg, #00f0ff, #7000ff);
+      color: white;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+      transform: scale(0) rotate(-180deg);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .chatbot-launcher.active {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+      pointer-events: auto;
+      animation: pulseLauncher 2.5s infinite alternate ease-in-out;
+    }
+    @keyframes pulseLauncher {
+      0% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.6); transform: scale(1); }
+      100% { box-shadow: 0 0 40px rgba(255, 0, 119, 0.8); transform: scale(1.08); }
+    }
+    .launcher-badge { position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; font-size: 11px; font-weight: 800; padding: 3px 7px; border-radius: 10px; border: 2px solid #020008; }
+
+    /* Chat Window */
+    .chat-window {
+      position: fixed;
+      bottom: 95px;
+      right: 28px;
+      width: min(350px, 90vw);
+      height: 460px;
+      background: rgba(15, 8, 32, 0.95);
+      backdrop-filter: blur(35px);
+      border: 1.5px solid rgba(0, 240, 255, 0.4);
+      border-radius: 22px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.8) translateY(40px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .chat-window.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: auto; }
+    .chat-header { padding: 14px 18px; background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(112, 0, 255, 0.15)); border-bottom: 1px solid rgba(0, 240, 255, 0.25); display: flex; justify-content: space-between; align-items: center; }
+    .chat-header-info { display: flex; align-items: center; gap: 10px; }
+    .chat-bot-icon { width: 34px; height: 34px; border-radius: 10px; background: #00f0ff; color: #000; display: flex; justify-content: center; align-items: center; font-size: 16px; }
+    .chat-header-info h4 { font-size: 14px; font-weight: 800; color: #fff; }
+    .chat-header-info p { font-size: 11px; color: #00f0ff; font-weight: 600; }
+    .close-chat { color: #94a3b8; font-size: 18px; cursor: pointer; }
+    .close-chat:hover { color: #ff0077; }
+    .chat-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    .chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 12.5px; line-height: 1.45; word-break: break-word; }
+    .chat-msg.bot { align-self: flex-start; background: rgba(0, 240, 255, 0.12); border: 1px solid rgba(0, 240, 255, 0.3); color: #e2e8f0; border-bottom-left-radius: 4px; }
+    .chat-msg.user { align-self: flex-end; background: linear-gradient(135deg, #7000ff, #ff0077); color: #fff; border-bottom-right-radius: 4px; }
+    .chat-footer { padding: 12px 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(0, 0, 0, 0.4); display: flex; gap: 8px; }
+    .chat-footer input { flex: 1; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(0, 240, 255, 0.3); background: rgba(10, 5, 22, 0.8); color: #fff; font-size: 13px; outline: none; }
+    .btn-send { background: #00f0ff; border: none; color: #000; width: 38px; height: 38px; border-radius: 12px; font-size: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+
+    /* 🔐 Reset Modal */
+    .reset-modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(16px); z-index: 10001; display: none; justify-content: center; align-items: center; padding: 16px; }
+    .reset-modal-overlay.active { display: flex; }
+    .reset-card { background: rgba(15, 8, 32, 0.95); border: 1.5px solid #00f0ff; border-radius: 26px; padding: 30px 24px; width: 100%; max-width: 420px; box-shadow: 0 0 60px rgba(0, 240, 255, 0.35); position: relative; }
+    .reset-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .reset-header h3 { font-size: 17px; color: #00f0ff; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .close-reset { color: #94a3b8; font-size: 20px; cursor: pointer; }
+    .close-reset:hover { color: #ff0077; }
+
+    /* 🌐 ULTRA FUTURISTIC FOOTER */
+    .vault-footer {
+      position: relative;
+      z-index: 2;
+      background: var(--bg-surface);
+      backdrop-filter: blur(40px);
+      border-top: 1px solid var(--border-color);
+      border-radius: 28px 28px 0 0;
+      padding: clamp(30px, 4vw, 50px) 20px 24px;
+      box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.5);
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1.5fr 1fr;
+      gap: clamp(20px, 3vw, 36px);
+      margin-bottom: 30px;
+    }
+    .footer-col h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-col p { font-size: 12.5px; color: var(--text-sub); line-height: 1.6; margin-bottom: 10px; }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 8px; }
+    .footer-col ul li a { color: var(--text-sub); font-size: 12.5px; text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .footer-col ul li a:hover { color: var(--accent-cyan); transform: translateX(3px); }
+
+    .contact-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; font-size: 12.5px; color: var(--text-sub); line-height: 1.4; }
+    .contact-item i { color: var(--accent-cyan); font-size: 14px; margin-top: 2px; }
+    .contact-item a { color: var(--text-main); text-decoration: none; font-weight: 600; word-break: break-all; }
+    .contact-item a:hover { color: var(--accent-cyan); text-decoration: underline; }
+
+    .social-links { display: flex; gap: 10px; margin-top: 12px; }
+    .social-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: var(--accent-cyan);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+    .social-btn:hover { transform: translateY(-3px); background: var(--accent-cyan); color: #000; box-shadow: 0 0 20px var(--accent-cyan); }
+    .social-btn.insta:hover { background: #e1306c; color: #fff; box-shadow: 0 0 20px #e1306c; }
+    .social-btn.fb:hover { background: #1877f2; color: #fff; box-shadow: 0 0 20px #1877f2; }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+    .host-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: 8px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .host-badge:hover { background: var(--accent-cyan); color: #000; }
+
+    @media (max-width: 900px) {
+      .footer-content { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .footer-content { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="aurora-layer">
+    <div class="aurora-orb orb-cyan"></div>
+    <div class="aurora-orb orb-purple"></div>
+    <div class="aurora-orb orb-pink"></div>
+  </div>
+
+  <canvas id="vortexCanvas"></canvas>
+
+  <!-- 🤖 CHATBOT LAUNCHER -->
+  <div class="chatbot-launcher" id="chatLauncher" onclick="toggleChatWindow()" title="Vortex Recovery Assistant">
+    <i class="fa-solid fa-robot"></i>
+    <span class="launcher-badge">Help</span>
+  </div>
+
+  <!-- 💬 CHATBOT WINDOW -->
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-bot-icon"><i class="fa-solid fa-brain"></i></div>
+        <div>
+          <h4>Vortex Gemini AI</h4>
+          <p>Security & Recovery Bot</p>
+        </div>
+      </div>
+      <i class="fa-solid fa-xmark close-chat" onclick="toggleChatWindow()"></i>
+    </div>
+    <div class="chat-body" id="chatBody">
+      <div class="chat-msg bot">
+        Hello! You had multiple failed login attempts. You can click <strong>'Forgot Password'</strong> to answer your Security Question and recreate your password directly. Or email <strong>vikram.2872006@gmail.com</strong>.
+      </div>
+    </div>
+    <form class="chat-footer" onsubmit="sendChatMessage(event)">
+      <input type="text" id="chatInput" placeholder="Ask for recovery help..." required autocomplete="off">
+      <button type="submit" class="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
+  </div>
+
+  <!-- 🔐 PASSWORD RESET MODAL -->
+  <div class="reset-modal-overlay" id="resetModal">
+    <div class="reset-card">
+      <div class="reset-header">
+        <h3><i class="fa-solid fa-shield-halved"></i> Reset Password</h3>
+        <i class="fa-solid fa-xmark close-reset" onclick="closeResetModal()"></i>
+      </div>
+
+      <div id="resetMsgBox" class="msg"></div>
+
+      <!-- Step 1: Enter User ID -->
+      <div id="resetStep1">
+        <p style="font-size: 12.5px; color: #cbd5e1; margin-bottom: 14px;">Enter your User ID to retrieve your Security Question.</p>
+        <div class="form-group">
+          <label>Your User ID</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-at field-icon"></i>
+            <input type="text" id="resetUserId" placeholder="e.g. rahul_99">
+          </div>
+        </div>
+        <button type="button" class="btn-neon" onclick="fetchSecurityQuestion()">
+          <i class="fa-solid fa-arrow-right"></i> Verify User ID
+        </button>
+      </div>
+
+      <!-- Step 2: Answer Question & Recreate Password -->
+      <form id="resetStep2" style="display: none;" onsubmit="handlePasswordRecreate(event)">
+        <p style="font-size: 12px; color: #00f0ff; font-weight: 700; margin-bottom: 10px;" id="displayQuestionText"></p>
+
+        <div class="form-group">
+          <label>Your Answer (Not Case Sensitive)</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-comment-dots field-icon"></i>
+            <input type="text" id="resetAnswer" required placeholder="Type your answer">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>New Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-key field-icon"></i>
+            <input type="password" id="resetNewPassword" required placeholder="Create new password">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-neon" id="btnRecreate">
+          <i class="fa-solid fa-rotate"></i> Recreate & Save Password
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- AUTH PORTAL WRAPPER -->
+  <div class="portal-wrapper">
+    <div class="glow-conduit" id="tiltContainer">
+      <div class="auth-card">
+        <div class="brand-header">
+          <div class="brand-icon-box"><i class="fa-solid fa-infinity"></i></div>
+          <h1>Vortex Identity</h1>
+          <p>Decentralized Neural Access Portal</p>
+        </div>
+
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('login')">Sign In</div>
+          <div class="tab" onclick="switchTab('signup')">Sign Up</div>
+        </div>
+
+        <div id="msgBox" class="msg"></div>
+
+        <!-- Sign In Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>User ID</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-fingerprint field-icon"></i>
+              <input type="text" id="loginUserId" required placeholder="Enter User ID">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-lock field-icon"></i>
+              <input type="password" id="loginPassword" required placeholder="Enter password">
+              <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('loginPassword', this)"></i>
+            </div>
+          </div>
+
+          <span class="forgot-link" onclick="openResetModal()">Forgot Password?</span>
+
+          <button type="submit" class="btn-neon">
+            <i class="fa-solid fa-bolt"></i> Authenticate
+          </button>
+        </form>
+
+        <!-- Sign Up Form (With 5 Security Questions) -->
+        <form id="signupForm" style="display: none;" onsubmit="handleSignup(event)">
+          <div class="form-group">
+            <label>Full Name</label>
+            <div class="input-wrapper">
+              <i class="fa-regular fa-id-card field-icon"></i>
+              <input type="text" id="signupName" required placeholder="Enter full name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Choose User ID</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-at field-icon"></i>
+              <input type="text" id="signupUserId" required placeholder="Create unique ID">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Passphrase</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-key field-icon"></i>
+              <input type="password" id="signupPassword" required placeholder="Create password">
+              <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('signupPassword', this)"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Security Question (Pick 1 of 5)</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-shield-cat field-icon"></i>
+              <select id="signupQuestion" required>
+                <option value="What is the name of your first school?">1. What is the name of your first school?</option>
+                <option value="What is your favorite childhood pet name?">2. What is your favorite childhood pet name?</option>
+                <option value="In which city were you born?">3. In which city were you born?</option>
+                <option value="What is your mother's maiden or nickname?">4. What is your mother's maiden or nickname?</option>
+                <option value="What was the model of your first bike/car?">5. What was the model of your first bike/car?</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Security Answer (Not Case-Sensitive)</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-comment field-icon"></i>
+              <input type="text" id="signupAnswer" required placeholder="Your answer (e.g., Modinagar, Bruno)">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-neon" style="margin-top: 10px;">
+            <i class="fa-solid fa-user-plus"></i> Initialize Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🌐 FOOTER SECTION -->
+  <footer class="vault-footer">
+    <div class="footer-content">
+      <!-- Col 1: About & Purpose -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-shield-halved"></i> Vortex Vault</h4>
+        <p>
+          Vortex Vault is a decentralized, neural-powered document management hub designed to eliminate paperwork chaos. Hosted natively on <strong>markiv.site</strong>, our goal is to empower individuals and families to securely digitize certificates, track warranty expiries, manage physical home storages, and retrieve records instantly using biometric-grade QR access.
+        </p>
+        <p style="color: var(--accent-cyan); font-weight: 700; font-size: 12px;">
+          🚀 Mission: Zero Lost Documents, Seamless Lifecycle Tracking & Instant Access.
+        </p>
+      </div>
+
+      <!-- Col 2: Quick Links -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-compass"></i> Ecosystem</h4>
+        <ul>
+          <li><a href="https://markiv.site" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i> Portal Home</a></li>
+          <li><a href="javascript:void(0)" onclick="openResetModal()"><i class="fa-solid fa-key"></i> Password Recovery</a></li>
+          <li><a href="javascript:void(0)" onclick="switchTab('signup')"><i class="fa-solid fa-user-plus"></i> Register Vault ID</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Direct Contact Details -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-headset"></i> Contact Us</h4>
+        <div class="contact-item">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>Modinagar, Ghaziabad, Uttar Pradesh (UP), India</span>
+        </div>
+        <div class="contact-item">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:+917309929051">+91 73099 29051</a>
+        </div>
+        <div class="contact-item">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:vikram.2872006@gmail.com">vikram.2872006@gmail.com</a>
+        </div>
+        <div class="contact-item">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <a href="mailto:vikram_cse_2024@rkgitm.ac.in">vikram_cse_2024@rkgitm.ac.in</a>
+        </div>
+      </div>
+
+      <!-- Col 4: Social Channels & Platform -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-share-nodes"></i> Connect</h4>
+        <p>Follow our platform updates or reach out directly across channels:</p>
+        <div class="social-links">
+          <a href="https://markiv.site" target="_blank" rel="noopener" class="social-btn" title="Official Web Portal">
+            <i class="fa-solid fa-globe"></i>
+          </a>
+          <a href="https://www.instagram.com/vikrm_bhardwaj?igsh=OWh4ZHprbW5rNTZv" target="_blank" rel="noopener" class="social-btn insta" title="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="https://www.facebook.com/share/196jZuggxg/" target="_blank" rel="noopener" class="social-btn fb" title="Facebook">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Copyright & Platform Bar -->
+    <div class="footer-bottom">
+      <div>
+        &copy; 2026 <strong>Vortex Vault</strong>. All rights reserved. Crafted by Vikram.
+      </div>
+      <div>
+        <a href="https://markiv.site" target="_blank" rel="noopener" class="host-badge">
+          <i class="fa-solid fa-server"></i> Deployed on markiv.site
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Canvas Vortex Particle Animation
+    const canvas = document.getElementById("vortexCanvas");
+    const ctx = canvas.getContext("2d");
+    let width = canvas.width = window.innerWidth, height = canvas.height = window.innerHeight;
+    window.addEventListener("resize", () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; });
+
+    const particles = [];
+    const colors = ["#00f0ff", "#7000ff", "#ff0077", "#38bdf8"];
+    for (let i = 0; i < 180; i++) {
+      particles.push({ x: (Math.random() - 0.5) * 2000, y: (Math.random() - 0.5) * 2000, z: Math.random() * 1000 + 1, color: colors[Math.floor(Math.random() * colors.length)] });
+    }
+
+    function renderVortex() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach((p) => {
+        p.z -= 3;
+        if (p.z <= 0) { p.z = 1000; p.x = (Math.random() - 0.5) * 2000; p.y = (Math.random() - 0.5) * 2000; }
+        const k = 400 / p.z;
+        const px = p.x * k + width / 2, py = p.y * k + height / 2;
+        if (px >= 0 && px <= width && py >= 0 && py <= height) {
+          ctx.beginPath();
+          ctx.arc(px, py, Math.max(1, (1 - p.z / 1000) * 4), 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = 1 - p.z / 1000;
+          ctx.fill();
+        }
+      });
+      requestAnimationFrame(renderVortex);
+    }
+    renderVortex();
+
+    // 3D Tilt (Desktop only)
+    if (window.innerWidth > 768) {
+      window.addEventListener("mousemove", (e) => {
+        const card = document.getElementById("tiltContainer");
+        if (card) {
+          const rx = (height / 2 - e.clientY) / 35;
+          const ry = (e.clientX - width / 2) / 35;
+          card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+        }
+      });
+    }
+
+    const API_BASE = window.location.origin;
+    let failedAttempts = 0;
+
+    window.onload = () => {
+      if (localStorage.getItem("vaultToken")) {
+        window.location.href = "dashboard.html";
+      }
+    };
+
+    function showMessage(text, isError = false) {
+      const msgBox = document.getElementById("msgBox");
+      msgBox.className = "msg " + (isError ? "error" : "success");
+      msgBox.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i> ${text}`;
+      msgBox.style.display = "flex";
+    }
+
+    function switchTab(type) {
+      document.getElementById("msgBox").style.display = "none";
+      const tabs = document.querySelectorAll(".tab");
+      tabs.forEach(t => t.classList.remove("active"));
+      
+      const targetIndex = type === "login" ? 0 : 1;
+      if (tabs[targetIndex]) tabs[targetIndex].classList.add("active");
+
+      document.getElementById("loginForm").style.display = type === "login" ? "block" : "none";
+      document.getElementById("signupForm").style.display = type === "signup" ? "block" : "none";
+    }
+
+    function togglePasswordVisibility(fieldId, icon) {
+      const field = document.getElementById(fieldId);
+      if (field.type === "password") { field.type = "text"; icon.classList.replace("fa-eye", "fa-eye-slash"); }
+      else { field.type = "password"; icon.classList.replace("fa-eye-slash", "fa-eye"); }
+    }
+
+    // 🤖 Chatbot Trigger
+    function toggleChatWindow() {
+      const win = document.getElementById("chatWindow");
+      win.classList.toggle("open");
+    }
+
+    async function sendChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      const chatBody = document.getElementById("chatBody");
+      const currentUserId = document.getElementById("loginUserId").value;
+      if (!text) return;
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "chat-msg user";
+      userMsg.innerText = text;
+      chatBody.appendChild(userMsg);
+      input.value = "";
+      chatBody.scrollTop = chatBody.scrollHeight;
+
+      const botMsg = document.createElement("div");
+      botMsg.className = "chat-msg bot";
+      botMsg.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Thinking...`;
+      chatBody.appendChild(botMsg);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/chat-recovery`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text, userId: currentUserId })
+        });
+        const data = await res.json();
+        botMsg.innerHTML = data.reply;
+      } catch (err) {
+        botMsg.innerHTML = "Click 'Forgot Password' to answer your security question and recreate your password.";
+      }
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // 🔐 Password Reset Modal Logic
+    function openResetModal() {
+      document.getElementById("resetModal").classList.add("active");
+      document.getElementById("resetStep1").style.display = "block";
+      document.getElementById("resetStep2").style.display = "none";
+      document.getElementById("resetMsgBox").style.display = "none";
+      const loginId = document.getElementById("loginUserId").value;
+      if (loginId) document.getElementById("resetUserId").value = loginId;
+    }
+
+    function closeResetModal() {
+      document.getElementById("resetModal").classList.remove("active");
+    }
+
+    function showResetMsg(text, isError = false) {
+      const box = document.getElementById("resetMsgBox");
+      box.className = "msg " + (isError ? "error" : "success");
+      box.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i> ${text}`;
+      box.style.display = "flex";
+    }
+
+    async function fetchSecurityQuestion() {
+      const uid = document.getElementById("resetUserId").value.trim();
+      if (!uid) return showResetMsg("Please enter your User ID", true);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/get-security-question`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customUserId: uid })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          document.getElementById("resetStep1").style.display = "none";
+          document.getElementById("resetStep2").style.display = "block";
+          document.getElementById("displayQuestionText").innerText = `Question: ${data.securityQuestion}`;
+          document.getElementById("resetMsgBox").style.display = "none";
+        } else {
+          showResetMsg(data.error || "User ID not found.", true);
+        }
+      } catch (err) {
+        showResetMsg("Server connection failed.", true);
+      }
+    }
+
+    async function handlePasswordRecreate(e) {
+      e.preventDefault();
+      const customUserId = document.getElementById("resetUserId").value.trim();
+      const securityAnswer = document.getElementById("resetAnswer").value.trim();
+      const newPassword = document.getElementById("resetNewPassword").value;
+      const btn = document.getElementById("btnRecreate");
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Updating...`;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/reset-password-with-answer`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customUserId, securityAnswer, newPassword })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showResetMsg("Password recreated successfully! Closing in 2s...");
+          setTimeout(() => {
+            closeResetModal();
+            showMessage("Password updated! Please log in with your new password.");
+            document.getElementById("loginPassword").value = "";
+          }, 2000);
+        } else {
+          showResetMsg(data.error || "Incorrect answer!", true);
+        }
+      } catch (err) {
+        showResetMsg("Failed to update password.", true);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-rotate"></i> Recreate & Save Password`;
+      }
+    }
+
+    // Login Handler
+    async function handleLogin(e) {
+      e.preventDefault();
+      const customUserId = document.getElementById("loginUserId").value;
+      const password = document.getElementById("loginPassword").value;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customUserId, password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          failedAttempts = 0;
+          localStorage.setItem("vaultToken", data.token);
+          localStorage.setItem("vaultUser", JSON.stringify(data.user));
+          window.location.href = "dashboard.html";
+        } else {
+          failedAttempts++;
+          showMessage(data.error || "Login denied", true);
+
+          if (failedAttempts >= 2) {
+            const launcher = document.getElementById("chatLauncher");
+            launcher.classList.add("active");
+          }
+        }
+      } catch (err) {
+        showMessage("Server connection failed.", true);
+      }
+    }
+
+    // Signup Handler
+    async function handleSignup(e) {
+      e.preventDefault();
+      const name = document.getElementById("signupName").value;
+      const customUserId = document.getElementById("signupUserId").value;
+      const password = document.getElementById("signupPassword").value;
+      const securityQuestion = document.getElementById("signupQuestion").value;
+      const securityAnswer = document.getElementById("signupAnswer").value;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/signup`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, customUserId, password, securityQuestion, securityAnswer })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem("vaultToken", data.token);
+          localStorage.setItem("vaultUser", JSON.stringify(data.user));
+          window.location.href = "dashboard.html";
+        } else {
+          showMessage(data.error || "Signup error", true);
+        }
+      } catch (err) {
+        showMessage("Server connection failed.", true);
+      }
+    }
+  </script>
+</body>
+</html>

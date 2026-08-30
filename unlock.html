@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  
+  <!-- 🚀 SEO Meta Tags for Google Ranking (#1 Target: markiv, markiv.site, vortex vault) -->
+  <title>QR Unlock Portal | Vortex Vault | markiv.site</title>
+  <meta name="description" content="Secure QR authentication and recovery access for Vortex Vault on markiv.site. Unlock your private document vault with biometric-grade password and security question validation.">
+  <meta name="keywords" content="Vortex Vault QR, markiv, markiv.site, QR unlock vault, secure QR access, document locker QR, Vikram Bhardwaj">
+  <meta name="author" content="Vikram">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://markiv.site">
+
+  <!-- 🌐 Social / Open Graph Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://markiv.site">
+  <meta property="og:title" content="Vortex Vault QR Unlock - markiv.site">
+  <meta property="og:description" content="Fast, secure QR-based access and recovery for your personal Vortex Vault.">
+  <meta property="og:site_name" content="Vortex Vault on markiv.site">
+
+  <!-- 🔍 Google JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Vortex Vault QR Unlock Portal",
+    "url": "https://markiv.site",
+    "description": "QR-based verification and access interface for Vortex Vault.",
+    "author": {
+      "@type": "Person",
+      "name": "Vikram",
+      "email": "vikram.2872006@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Modinagar",
+        "addressRegion": "Uttar Pradesh",
+        "addressCountry": "IN"
+      }
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #02010a;
+      --bg-surface: rgba(13, 8, 30, 0.8);
+      --bg-card: rgba(18, 10, 42, 0.9);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-color: rgba(0, 240, 255, 0.3);
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --accent-pink: #ff007f;
+      --accent-glow: rgba(0, 240, 255, 0.4);
+      --input-bg: rgba(6, 2, 16, 0.85);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-main);
+      min-height: 100vh;
+      color: var(--text-main);
+      overflow-x: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .aurora-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .aurora-orb { position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.55; animation: floatNebula 14s infinite alternate ease-in-out; }
+    .orb-cyan { width: min(500px, 85vw); height: min(500px, 85vw); background: radial-gradient(circle, #00f0ff 0%, transparent 70%); top: -10%; left: -10%; }
+    .orb-purple { width: min(550px, 90vw); height: min(550px, 90vw); background: radial-gradient(circle, #9d4edd 0%, transparent 70%); bottom: -10%; right: -10%; animation-duration: 10s; }
+    @keyframes floatNebula { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-40px, 60px) scale(1.15); } }
+
+    /* Page Wrapper for Zero-Overlap */
+    .portal-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      min-height: calc(100vh - 120px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(20px, 4vw, 40px) 16px;
+    }
+
+    .unlock-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 28px;
+      padding: clamp(28px, 4vw, 40px) clamp(20px, 3vw, 32px);
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(0, 240, 255, 0.25);
+      backdrop-filter: blur(35px);
+      position: relative;
+      animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .shield-icon {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 16px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(157, 78, 221, 0.2));
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      color: var(--accent-cyan);
+      box-shadow: 0 0 25px var(--accent-glow);
+    }
+
+    h1.main-title { font-size: clamp(20px, 3vw, 22px); font-weight: 800; margin-bottom: 6px; letter-spacing: -0.3px; }
+    p.user-tag { font-size: 13px; color: var(--accent-cyan); font-weight: 700; margin-bottom: 22px; word-break: break-all; }
+
+    .form-group { margin-bottom: 16px; text-align: left; }
+    label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; color: #cbd5e1; font-weight: 700; }
+
+    .pass-input-wrapper { position: relative; display: flex; align-items: center; }
+    .pass-input-wrapper i.field-icon { position: absolute; left: 16px; color: var(--accent-cyan); font-size: 15px; pointer-events: none; }
+    
+    input[type="password"], input[type="text"] {
+      width: 100%;
+      padding: 13px 40px 13px 46px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      background: var(--input-bg);
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 20px var(--accent-glow); }
+
+    .forgot-btn {
+      font-size: 12px;
+      color: var(--accent-cyan);
+      margin-top: 10px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      display: inline-block;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    .btn-unlock {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #00f0ff, #9d4edd 60%, #ff007f);
+      background-size: 200% 200%;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 25px var(--accent-glow);
+      transition: all 0.3s;
+    }
+    .btn-unlock:hover { transform: translateY(-2px); box-shadow: 0 10px 35px var(--accent-glow); }
+
+    .msg { padding: 11px 14px; border-radius: 12px; font-size: 12.5px; margin-bottom: 14px; display: none; align-items: center; gap: 8px; font-weight: 700; }
+    .msg.error { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); display: flex; }
+    .msg.success { background: rgba(34, 197, 94, 0.18); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.4); display: flex; }
+
+    .loading-box { font-size: 14px; color: var(--accent-cyan); font-weight: 700; padding: 10px 0; }
+
+    .question-box {
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px dashed var(--border-color);
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .question-box span { font-size: 11px; text-transform: uppercase; color: var(--text-sub); font-weight: 700; display: block; margin-bottom: 4px; }
+    .question-box h5 { font-size: 13.5px; color: var(--accent-cyan); font-weight: 700; }
+
+    /* 🌐 ULTRA FUTURISTIC FOOTER */
+    .vault-footer {
+      position: relative;
+      z-index: 2;
+      background: var(--bg-surface);
+      backdrop-filter: blur(40px);
+      border-top: 1px solid var(--border-color);
+      border-radius: 28px 28px 0 0;
+      padding: clamp(30px, 4vw, 50px) 20px 24px;
+      box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.5);
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1.5fr 1fr;
+      gap: clamp(20px, 3vw, 36px);
+      margin-bottom: 30px;
+    }
+    .footer-col h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-col p { font-size: 12.5px; color: var(--text-sub); line-height: 1.6; margin-bottom: 10px; }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 8px; }
+    .footer-col ul li a { color: var(--text-sub); font-size: 12.5px; text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .footer-col ul li a:hover { color: var(--accent-cyan); transform: translateX(3px); }
+
+    .contact-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; font-size: 12.5px; color: var(--text-sub); line-height: 1.4; }
+    .contact-item i { color: var(--accent-cyan); font-size: 14px; margin-top: 2px; }
+    .contact-item a { color: var(--text-main); text-decoration: none; font-weight: 600; word-break: break-all; }
+    .contact-item a:hover { color: var(--accent-cyan); text-decoration: underline; }
+
+    .social-links { display: flex; gap: 10px; margin-top: 12px; }
+    .social-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: var(--accent-cyan);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+    .social-btn:hover { transform: translateY(-3px); background: var(--accent-cyan); color: #000; box-shadow: 0 0 20px var(--accent-cyan); }
+    .social-btn.insta:hover { background: #e1306c; color: #fff; box-shadow: 0 0 20px #e1306c; }
+    .social-btn.fb:hover { background: #1877f2; color: #fff; box-shadow: 0 0 20px #1877f2; }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+    .host-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: 8px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .host-badge:hover { background: var(--accent-cyan); color: #000; }
+
+    @media (max-width: 900px) {
+      .footer-content { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .footer-content { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="aurora-layer">
+    <div class="aurora-orb orb-cyan"></div>
+    <div class="aurora-orb orb-purple"></div>
+  </div>
+
+  <div class="portal-wrapper">
+    <div class="unlock-card" id="unlockCard">
+      <div class="shield-icon" id="shieldIcon"><i class="fa-solid fa-lock"></i></div>
+      <h1 class="main-title" id="mainTitle">Vortex Vault Access</h1>
+      <p class="user-tag" id="userDisplay">Verifying QR Permission...</p>
+
+      <div id="statusMsg" class="msg"></div>
+
+      <!-- VIEW 1: Standard Password Login -->
+      <form id="passForm" onsubmit="handleUnlock(event)" style="display: none;">
+        <div class="form-group">
+          <label>Vault Password</label>
+          <div class="pass-input-wrapper">
+            <i class="fa-solid fa-key field-icon"></i>
+            <input type="password" id="vaultPassword" placeholder="Enter Vault Password" required autofocus>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-unlock" id="btnUnlock">
+          <i class="fa-solid fa-unlock-keyhole"></i> Unlock Vault
+        </button>
+
+        <div>
+          <span class="forgot-btn" onclick="switchToResetView()">Forgot Password? Answer Security Question</span>
+        </div>
+      </form>
+
+      <!-- VIEW 2: Security Question & Password Recreate -->
+      <form id="resetForm" onsubmit="handleSecurityRecreate(event)" style="display: none;">
+        <div class="question-box">
+          <span>Security Verification Question</span>
+          <h5 id="securityQuestionLabel">Loading Question...</h5>
+        </div>
+
+        <div class="form-group">
+          <label>Your Answer (Not Case-Sensitive)</label>
+          <div class="pass-input-wrapper">
+            <i class="fa-solid fa-comment-dots field-icon"></i>
+            <input type="text" id="securityAnswerInput" placeholder="Type your answer" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Recreate New Password</label>
+          <div class="pass-input-wrapper">
+            <i class="fa-solid fa-lock field-icon"></i>
+            <input type="password" id="newPasswordInput" placeholder="Create new password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-unlock" id="btnResetSubmit">
+          <i class="fa-solid fa-rotate"></i> Recreate Password & Open
+        </button>
+
+        <div>
+          <span class="forgot-btn" onclick="switchToPassView()">Back to Password Login</span>
+        </div>
+      </form>
+
+      <div class="loading-box" id="loadingBox">
+        <i class="fa-solid fa-spinner fa-spin"></i> Checking Vault Permissions...
+      </div>
+    </div>
+  </div>
+
+  <!-- 🌐 FOOTER SECTION -->
+  <footer class="vault-footer">
+    <div class="footer-content">
+      <!-- Col 1: About & Purpose -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-shield-halved"></i> Vortex Vault</h4>
+        <p>
+          Vortex Vault is a decentralized, neural-powered document management hub designed to eliminate paperwork chaos. Hosted natively on <strong>markiv.site</strong>, our goal is to empower individuals and families to securely digitize certificates, track warranty expiries, manage physical home storages, and retrieve records instantly using biometric-grade QR access.
+        </p>
+        <p style="color: var(--accent-cyan); font-weight: 700; font-size: 12px;">
+          🚀 Mission: Zero Lost Documents, Seamless Lifecycle Tracking & Instant Access.
+        </p>
+      </div>
+
+      <!-- Col 2: Quick Links -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-compass"></i> Ecosystem</h4>
+        <ul>
+          <li><a href="https://markiv.site" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i> Portal Home</a></li>
+          <li><a href="index.html"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login / Register</a></li>
+          <li><a href="javascript:void(0)" onclick="switchToResetView()"><i class="fa-solid fa-key"></i> Passcode Recovery</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Direct Contact Details -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-headset"></i> Contact Us</h4>
+        <div class="contact-item">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>Modinagar, Ghaziabad, Uttar Pradesh (UP), India</span>
+        </div>
+        <div class="contact-item">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:+917309929051">+91 73099 29051</a>
+        </div>
+        <div class="contact-item">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:vikram.2872006@gmail.com">vikram.2872006@gmail.com</a>
+        </div>
+        <div class="contact-item">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <a href="mailto:vikram_cse_2024@rkgitm.ac.in">vikram_cse_2024@rkgitm.ac.in</a>
+        </div>
+      </div>
+
+      <!-- Col 4: Social Channels & Platform -->
+      <div class="footer-col">
+        <h4><i class="fa-solid fa-share-nodes"></i> Connect</h4>
+        <p>Follow our platform updates or reach out directly across channels:</p>
+        <div class="social-links">
+          <a href="https://markiv.site" target="_blank" rel="noopener" class="social-btn" title="Official Web Portal">
+            <i class="fa-solid fa-globe"></i>
+          </a>
+          <a href="https://www.instagram.com/vikrm_bhardwaj?igsh=OWh4ZHprbW5rNTZv" target="_blank" rel="noopener" class="social-btn insta" title="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="https://www.facebook.com/share/196jZuggxg/" target="_blank" rel="noopener" class="social-btn fb" title="Facebook">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Copyright & Platform Bar -->
+    <div class="footer-bottom">
+      <div>
+        &copy; 2026 <strong>Vortex Vault</strong>. All rights reserved. Crafted by Vikram.
+      </div>
+      <div>
+        <a href="https://markiv.site" target="_blank" rel="noopener" class="host-badge">
+          <i class="fa-solid fa-server"></i> Deployed on markiv.site
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetUserId = urlParams.get("u");
+    let currentSecurityQuestion = "";
+
+    function showMsg(text, isError = false) {
+      const box = document.getElementById("statusMsg");
+      box.className = "msg " + (isError ? "error" : "success");
+      box.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i> ${text}`;
+      box.style.display = "flex";
+    }
+
+    async function checkSecurityStatus() {
+      if (!targetUserId) {
+        document.getElementById("userDisplay").innerText = "Invalid QR Link";
+        document.getElementById("loadingBox").style.display = "none";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/qr-status/${encodeURIComponent(targetUserId)}`);
+        const data = await res.json();
+
+        if (res.ok) {
+          document.getElementById("userDisplay").innerText = `Owner: ${data.name} (@${data.customUserId})`;
+
+          if (!data.isQrLocked && data.instantToken) {
+            // 🔓 Privacy is OFF -> DIRECT ACCESS
+            document.getElementById("shieldIcon").innerHTML = `<i class="fa-solid fa-lock-open" style="color: #22c55e;"></i>`;
+            document.getElementById("loadingBox").innerHTML = `<i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> Access Granted! Opening Vault...`;
+            
+            localStorage.setItem("vaultToken", data.instantToken);
+            localStorage.setItem("vaultUser", JSON.stringify({ name: data.name, customUserId: data.customUserId }));
+            
+            setTimeout(() => {
+              window.location.href = "dashboard.html";
+            }, 800);
+          } else {
+            // 🔒 Privacy is ON -> Show Password Form
+            document.getElementById("loadingBox").style.display = "none";
+            document.getElementById("passForm").style.display = "block";
+          }
+        } else {
+          document.getElementById("userDisplay").innerText = "Vault Not Found";
+          document.getElementById("loadingBox").style.display = "none";
+        }
+      } catch (err) {
+        document.getElementById("loadingBox").innerText = "Server Connection Error";
+      }
+    }
+
+    checkSecurityStatus();
+
+    // Regular Password Unlock
+    async function handleUnlock(e) {
+      e.preventDefault();
+      const password = document.getElementById("vaultPassword").value;
+      const btn = document.getElementById("btnUnlock");
+      document.getElementById("statusMsg").style.display = "none";
+
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Unlocking...`;
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customUserId: targetUserId, password: password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem("vaultToken", data.token);
+          localStorage.setItem("vaultUser", JSON.stringify(data.user));
+          window.location.href = "dashboard.html";
+        } else {
+          showMsg(data.error || "Incorrect Password!", true);
+        }
+      } catch (err) {
+        showMsg("Server error.", true);
+      } finally {
+        btn.innerHTML = `<i class="fa-solid fa-unlock-keyhole"></i> Unlock Vault`;
+        btn.disabled = false;
+      }
+    }
+
+    // Switch to Security Question Reset View
+    async function switchToResetView() {
+      document.getElementById("statusMsg").style.display = "none";
+      document.getElementById("passForm").style.display = "none";
+      document.getElementById("resetForm").style.display = "block";
+
+      if (!currentSecurityQuestion) {
+        try {
+          const res = await fetch(`${API_BASE}/api/auth/get-security-question`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ customUserId: targetUserId })
+          });
+          const data = await res.json();
+          if (res.ok) {
+            currentSecurityQuestion = data.securityQuestion;
+            document.getElementById("securityQuestionLabel").innerText = currentSecurityQuestion;
+          } else {
+            showMsg(data.error || "Failed to load security question.", true);
+          }
+        } catch (err) {
+          showMsg("Connection failed.", true);
+        }
+      }
+    }
+
+    function switchToPassView() {
+      document.getElementById("statusMsg").style.display = "none";
+      document.getElementById("resetForm").style.display = "none";
+      document.getElementById("passForm").style.display = "block";
+    }
+
+    // Handle Security Question Answer & Password Recreate
+    async function handleSecurityRecreate(e) {
+      e.preventDefault();
+      const answer = document.getElementById("securityAnswerInput").value.trim();
+      const newPassword = document.getElementById("newPasswordInput").value;
+      const btn = document.getElementById("btnResetSubmit");
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verifying...`;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/reset-password-with-answer`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customUserId: targetUserId,
+            securityAnswer: answer,
+            newPassword: newPassword
+          })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showMsg("Password recreated! Logging you in...", false);
+          
+          const loginRes = await fetch(`${API_BASE}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ customUserId: targetUserId, password: newPassword })
+          });
+          const loginData = await loginRes.json();
+
+          if (loginRes.ok) {
+            localStorage.setItem("vaultToken", loginData.token);
+            localStorage.setItem("vaultUser", JSON.stringify(loginData.user));
+            setTimeout(() => {
+              window.location.href = "dashboard.html";
+            }, 1000);
+          }
+        } else {
+          showMsg(data.error || "Incorrect answer to security question!", true);
+        }
+      } catch (err) {
+        showMsg("Failed to connect to server.", true);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-rotate"></i> Recreate Password & Open`;
+      }
+    }
+  </script>
+</body>
+</html>
