@@ -53,7 +53,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   password: { type: String, required: true },
   securityQuestion: { type: String, required: true },
-  securityAnswer: { type: String, required: true }, // Lowercase & trimmed
+  securityAnswer: { type: String, required: true },
   isQrLocked: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 });
@@ -130,7 +130,6 @@ app.post("/api/auth/signup", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     
-    // Normalize security answer: trim and lowercase (case-insensitive)
     const normalizedAnswer = securityAnswer.trim().toLowerCase();
     const hashedAnswer = await bcrypt.hash(normalizedAnswer, salt);
 
@@ -172,7 +171,6 @@ app.post("/api/auth/login", async (req, res) => {
 
 // ---------------- PASSWORD RESET / RECREATE APIS ----------------
 
-// Step 1: Fetch Security Question for User
 app.post("/api/auth/get-security-question", async (req, res) => {
   try {
     const { customUserId } = req.body;
@@ -187,7 +185,6 @@ app.post("/api/auth/get-security-question", async (req, res) => {
   }
 });
 
-// Step 2: Verify Answer & Reset Password
 app.post("/api/auth/reset-password-with-answer", async (req, res) => {
   try {
     const { customUserId, securityAnswer, newPassword } = req.body;
@@ -198,7 +195,6 @@ app.post("/api/auth/reset-password-with-answer", async (req, res) => {
     const user = await User.findOne({ customUserId: customUserId.trim().toLowerCase() });
     if (!user) return res.status(404).json({ error: "User not found." });
 
-    // Verify answer case-insensitively
     const normalizedInputAnswer = securityAnswer.trim().toLowerCase();
     const isAnswerMatch = await bcrypt.compare(normalizedInputAnswer, user.securityAnswer);
 
@@ -206,7 +202,6 @@ app.post("/api/auth/reset-password-with-answer", async (req, res) => {
       return res.status(400).json({ error: "Incorrect answer to the security question." });
     }
 
-    // Hash and replace old password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
@@ -374,6 +369,30 @@ app.get("/api/documents", authMiddleware, async (req, res) => {
     return res.json({ documents: docs });
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch." });
+  }
+});
+
+// ✏️ UPDATE DOCUMENT LOCATION / DETAILS
+app.put("/api/documents/:id", authMiddleware, async (req, res) => {
+  try {
+    const { physicalLocation } = req.body;
+    if (!physicalLocation) {
+      return res.status(400).json({ error: "Physical location is required." });
+    }
+
+    const updatedDoc = await Document.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.customUserId },
+      { physicalLocation: physicalLocation.trim() },
+      { new: true }
+    );
+
+    if (!updatedDoc) {
+      return res.status(404).json({ error: "Document not found or unauthorized." });
+    }
+
+    return res.json({ message: "Location updated successfully", document: updatedDoc });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to update document location." });
   }
 });
 

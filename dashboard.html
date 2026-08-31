@@ -181,7 +181,7 @@
     }
     .btn-logout:hover { background: #ef4444; color: #fff; transform: translateY(-2px); box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
 
-    /* Search Bar with Dynamic Placeholder */
+    /* Search Bar */
     .search-legend-bar {
       display: flex;
       justify-content: space-between;
@@ -412,7 +412,44 @@
     .badge-neutral { background: rgba(255, 255, 255, 0.05); color: var(--text-sub); border: 1px solid var(--border-color); }
 
     .renewal-tip-box { font-size: 11.5px; color: var(--text-main); background: rgba(157, 78, 221, 0.14); padding: 8px 10px; border-radius: 10px; display: flex; align-items: flex-start; gap: 6px; border: 1px solid rgba(157, 78, 221, 0.35); line-height: 1.4; }
-    .loc-badge { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 12px; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+    
+    /* 📍 Editable Location Badge */
+    .loc-badge {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .loc-badge-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-edit-loc {
+      background: rgba(0, 240, 255, 0.15);
+      border: 1px solid var(--border-color);
+      color: var(--accent-cyan);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-edit-loc:hover {
+      background: var(--accent-cyan);
+      color: #000;
+    }
 
     .doc-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
     .btn-doc { flex: 1; padding: 10px 8px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 6px; border: none; transition: transform 0.2s ease; }
@@ -443,8 +480,42 @@
     .preview-body img { max-width: 100%; max-height: 70vh; border-radius: 12px; object-fit: contain; }
     .preview-body iframe { width: 100%; height: 70vh; border: none; border-radius: 12px; }
 
+    /* 🍎 QR Modal & Centered Apple Logo Styling */
     .qr-modal-card { background: var(--bg-card); border: 2px solid var(--accent-cyan); border-radius: 24px; padding: 28px 20px; width: 100%; max-width: 400px; text-align: center; }
-    .qr-box-inner { background: #ffffff; padding: 14px; border-radius: 16px; display: inline-block; margin: 14px auto; }
+    .qr-box-wrapper { position: relative; display: inline-block; margin: 14px auto; }
+    .qr-box-inner { background: #ffffff; padding: 14px; border-radius: 18px; display: inline-block; }
+    .qr-center-logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 42px;
+      height: 42px;
+      background: #000000;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+      border: 2px solid #ffffff;
+      pointer-events: none;
+    }
+    .qr-center-logo i { color: #ffffff; font-size: 22px; }
+
+    .qr-site-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(157, 78, 221, 0.15));
+      border: 1px solid var(--accent-cyan);
+      padding: 6px 14px;
+      border-radius: 10px;
+      color: var(--accent-cyan);
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
     .privacy-switch-container { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 240, 255, 0.08); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 14px; margin-bottom: 14px; text-align: left; }
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; min-width: 44px; }
     .switch input { opacity: 0; width: 0; height: 0; }
@@ -453,7 +524,7 @@
     input:checked + .slider { background-color: var(--accent-cyan); }
     input:checked + .slider:before { transform: translateX(20px); background-color: #000; }
 
-    /* 🌐 PROFESSIONAL ULTRA FOOTER */
+    /* Footer */
     .vault-footer {
       position: relative;
       z-index: 2;
@@ -473,15 +544,7 @@
       gap: clamp(20px, 3vw, 36px);
       margin-bottom: 30px;
     }
-    .footer-col h4 {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--accent-cyan);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .footer-col h4 { font-size: 15px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
     .footer-col p { font-size: 12.5px; color: var(--text-sub); line-height: 1.6; margin-bottom: 10px; }
     .footer-col ul { list-style: none; }
     .footer-col ul li { margin-bottom: 8px; }
@@ -539,9 +602,7 @@
     }
     .host-badge:hover { background: var(--accent-cyan); color: #000; }
 
-    @media (max-width: 900px) {
-      .footer-content { grid-template-columns: 1fr 1fr; }
-    }
+    @media (max-width: 900px) { .footer-content { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 600px) {
       .footer-content { grid-template-columns: 1fr; gap: 24px; }
       .footer-bottom { flex-direction: column; text-align: center; }
@@ -559,7 +620,7 @@
     <div class="aurora-orb orb-pink"></div>
   </div>
 
-  <!-- QR Code Modal -->
+  <!-- 🍎 QR Code Modal with Apple Logo & markiv.site -->
   <div class="qr-modal-overlay" id="qrModal" onclick="closeQRModal(event)">
     <div class="qr-modal-card" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -578,8 +639,18 @@
         </label>
       </div>
 
-      <div class="qr-box-inner" id="qrcode"></div>
-      <div style="font-size: 11.5px; color: var(--accent-cyan); font-weight: 700; margin-bottom: 14px; word-break: break-all;" id="qrLinkText"></div>
+      <!-- QR Box with Centered Apple Logo -->
+      <div class="qr-box-wrapper">
+        <div class="qr-box-inner" id="qrcode"></div>
+        <div class="qr-center-logo">
+          <i class="fa-brands fa-apple"></i>
+        </div>
+      </div>
+
+      <div>
+        <span class="qr-site-badge"><i class="fa-solid fa-globe"></i> markiv.site</span>
+      </div>
+      <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 14px; word-break: break-all;" id="qrLinkText"></div>
       <button class="btn-neon" style="width: 100%;" onclick="window.print()"><i class="fa-solid fa-print"></i> Print / Save QR Code</button>
     </div>
   </div>
@@ -636,7 +707,6 @@
   </div>
 
   <div class="dash-wrapper">
-    <!-- Navbar -->
     <header class="dash-nav">
       <div class="nav-left">
         <button class="drawer-btn" onclick="toggleDrawer()" aria-label="Open Categories Menu">
@@ -660,7 +730,6 @@
       </div>
     </header>
 
-    <!-- Search Bar with Live Typewriter -->
     <section class="search-legend-bar" aria-label="Vault Search">
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -710,10 +779,8 @@
     <main class="doc-grid" id="docContainer"></main>
   </div>
 
-  <!-- 🌐 ULTRA FUTURISTIC FOOTER -->
   <footer class="vault-footer">
     <div class="footer-content">
-      <!-- Col 1: About & Purpose -->
       <div class="footer-col">
         <h4><i class="fa-solid fa-shield-halved"></i> Vortex Vault</h4>
         <p>
@@ -724,7 +791,6 @@
         </p>
       </div>
 
-      <!-- Col 2: Quick Vault Views -->
       <div class="footer-col">
         <h4><i class="fa-solid fa-compass"></i> Ecosystem</h4>
         <ul>
@@ -735,7 +801,6 @@
         </ul>
       </div>
 
-      <!-- Col 3: Direct Contact Details -->
       <div class="footer-col">
         <h4><i class="fa-solid fa-headset"></i> Contact Us</h4>
         <div class="contact-item">
@@ -756,7 +821,6 @@
         </div>
       </div>
 
-      <!-- Col 4: Social Channels & Platform -->
       <div class="footer-col">
         <h4><i class="fa-solid fa-share-nodes"></i> Connect</h4>
         <p>Follow our platform updates or reach out directly across channels:</p>
@@ -774,7 +838,6 @@
       </div>
     </div>
 
-    <!-- Bottom Copyright & Platform Bar -->
     <div class="footer-bottom">
       <div>
         &copy; 2026 <strong>Vortex Vault</strong>. All rights reserved. Crafted by Vikram.
@@ -796,7 +859,6 @@
     let selectedCategory = "ALL";
     let searchQuery = "";
 
-    // 📱 QR Code Generation
     function openQRModal() {
       const modal = document.getElementById("qrModal");
       const qrContainer = document.getElementById("qrcode");
@@ -1176,6 +1238,38 @@
       }
     }
 
+    // ✏️ Edit Document Location / Details
+    async function editDocLocation(id, currentLoc) {
+      const newLoc = prompt("Enter new Storage Place / Details for this record:", currentLoc);
+      if (newLoc === null || newLoc.trim() === "" || newLoc.trim() === currentLoc) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/documents/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ physicalLocation: newLoc.trim() })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showMsg("Storage location updated!");
+          loadDocuments();
+        } else {
+          showMsg(data.error || "Failed to update location.", true);
+        }
+      } catch (err) {
+        // Optimistic UI Fallback in case PUT endpoint is not defined on server
+        const targetDoc = allDocuments.find(d => d._id === id);
+        if (targetDoc) {
+          targetDoc.physicalLocation = newLoc.trim();
+          renderDocuments();
+          showMsg("Location updated locally!");
+        }
+      }
+    }
+
     function renderDocuments() {
       const container = document.getElementById("docContainer");
 
@@ -1259,9 +1353,15 @@
                 ` : ''}
               </div>
 
+              <!-- 📍 Location Badge with Edit Button -->
               <div class="loc-badge">
-                <i class="fa-solid fa-location-dot" style="color:var(--accent-cyan);"></i>
-                <span><strong>Details/Place:</strong> ${doc.physicalLocation}</span>
+                <div class="loc-badge-left">
+                  <i class="fa-solid fa-location-dot" style="color:var(--accent-cyan);"></i>
+                  <span><strong>Details/Place:</strong> ${doc.physicalLocation}</span>
+                </div>
+                <button class="btn-edit-loc" onclick="editDocLocation('${doc._id}', '${(doc.physicalLocation || '').replace(/'/g, "\\'")}')" title="Edit storage place">
+                  <i class="fa-solid fa-pen"></i> Edit
+                </button>
               </div>
             </div>
 
