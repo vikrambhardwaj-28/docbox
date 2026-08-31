@@ -227,7 +227,7 @@ app.post("/api/auth/chat-recovery", async (req, res) => {
       });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-3.7-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
     const prompt = `You are "Vortex AI Support".
 The user has failed login attempts. User Context: "${userId || 'Unknown'}". User Message: "${message}".
 Guide them in 2 short sentences: They can click the "Forgot Password" button on the screen to answer their Security Question and reset their password instantly, or email vikram.2872006@gmail.com for help. English only.`;
