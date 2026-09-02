@@ -276,16 +276,23 @@ async function processDocumentAIBackground(docId, fileUrl, fileMimetype) {
 
   try {
     const fileFetch = await fetch(fileUrl);
+    if (!fileFetch.ok) {
+      console.error(`[Background AI] Cloudinary fetch failed for doc: ${docId}`);
+      return;
+    }
     const arrayBuffer = await fileFetch.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString("base64");
 
-    let mimeType = fileMimetype || "image/jpeg";
-    if (mimeType === "application/octet-stream") mimeType = "image/jpeg";
+    // MIME-type normalization for Gemini API
+    let cleanMime = fileMimetype ? fileMimetype.split(";")[0].trim().toLowerCase() : "image/jpeg";
+    if (cleanMime === "application/octet-stream" || !cleanMime) {
+      cleanMime = fileUrl.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg";
+    }
 
     const filePart = {
       inlineData: {
         data: base64Data,
-        mimeType: mimeType
+        mimeType: cleanMime
       }
     };
 
@@ -298,7 +305,7 @@ async function processDocumentAIBackground(docId, fileUrl, fileMimetype) {
 6. "renewalTip": Short renewal tip
 7. "summary": Brief note
 
-Return raw JSON:
+Return raw JSON only:
 {"personName":"","documentType":"","issueDate":"","validitySpan":"","expiryDate":null,"renewalTip":"","summary":""}`;
 
     const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
@@ -316,7 +323,7 @@ Return raw JSON:
     if (parsed.summary) updateData.aiSummary = parsed.summary;
 
     await Document.findByIdAndUpdate(docId, updateData);
-    console.log(`[Background AI] Updated record ${docId} successfully.`);
+    console.log(`[Background AI] Document ${docId} parsed and saved successfully.`);
   } catch (err) {
     console.error(`[Background AI Error for ${docId}]:`, err.message);
   }
@@ -340,7 +347,7 @@ app.post("/api/documents/upload", authMiddleware, upload.single("docFile"), asyn
     if (req.file) {
       fileName = req.file.filename;
       fileOriginalName = req.file.originalname;
-      fileUrl = req.file.path; // Cloudinary secure CDN URL
+      fileUrl = req.file.path; // Permanent Cloudinary URL
       fileType = req.file.mimetype;
     }
 
@@ -358,10 +365,10 @@ app.post("/api/documents/upload", authMiddleware, upload.single("docFile"), asyn
 
     await newDoc.save();
 
-    // ⚡ तुरंत यूज़र को रिस्पॉन्स भेजें (0 सेकंड वेट)
+    // ⚡ 1. तुरंत रिस्पॉन्स (0 सेकंड इंतज़ार)
     res.status(201).json({ message: "Stored successfully", document: newDoc });
 
-    // ⚡ बैकग्राउंड में AI चलेगा (साइट बंद होने पर भी डेटाबेस अपडेट हो जाएगा)
+    // ⚡ 2. बैकग्राउंड में AI चलेगा (साइट बंद होने पर भी डेटाबेस में डिटेल्स भर देगा)
     if (req.file) {
       processDocumentAIBackground(newDoc._id, fileUrl, fileType);
     }
