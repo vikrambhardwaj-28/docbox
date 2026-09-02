@@ -7,6 +7,8 @@ const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
@@ -15,29 +17,31 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/my_custom_
 const JWT_SECRET = process.env.JWT_SECRET || "MY_CUSTOM_SECRET_KEY_2026";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
+// Cloudinary Setup
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "vortex_vault",
+    allowed_formats: ["jpg", "png", "jpeg", "pdf"],
+    resource_type: "auto"
+  }
+});
+const upload = multer({ storage });
+
 let genAI = null;
 if (GEMINI_API_KEY) {
   genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 }
 
-const uploadDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage });
-
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname)));
-app.use("/uploads", express.static(uploadDir));
 
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 app.get("/dashboard.html", (req, res) => res.sendFile(path.join(__dirname, "dashboard.html")));
@@ -291,20 +295,24 @@ app.post("/api/documents/upload", authMiddleware, upload.single("docFile"), asyn
     if (req.file) {
       fileName = req.file.filename;
       fileOriginalName = req.file.originalname;
-      fileUrl = `/uploads/${req.file.filename}`;
+      fileUrl = req.file.path; // Cloudinary secure CDN URL
       fileType = req.file.mimetype;
 
       if (GEMINI_API_KEY && genAI) {
         try {
           const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
-          const filePath = path.join(uploadDir, req.file.filename);
           
+          // Cloudinary URL se buffer fetch karke base64 banana
+          const fileFetch = await fetch(req.file.path);
+          const arrayBuffer = await fileFetch.arrayBuffer();
+          const base64Data = Buffer.from(arrayBuffer).toString("base64");
+
           let mimeType = req.file.mimetype || "image/jpeg";
           if (mimeType === "application/octet-stream") mimeType = "image/jpeg";
 
           const filePart = {
             inlineData: {
-              data: fs.readFileSync(filePath).toString("base64"),
+              data: base64Data,
               mimeType: mimeType
             }
           };
@@ -402,8 +410,11 @@ app.delete("/api/documents/:id", authMiddleware, async (req, res) => {
     if (!doc) return res.status(404).json({ error: "Not found." });
 
     if (doc.fileName && doc.fileName !== "no-file") {
-      const filePath = path.join(uploadDir, doc.fileName);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      try {
+        await cloudinary.uploader.destroy(doc.fileName);
+      } catch (cErr) {
+        console.warn("Cloudinary delete failed:", cErr.message);
+      }
     }
 
     await Document.findByIdAndDelete(req.params.id);
