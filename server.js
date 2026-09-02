@@ -225,7 +225,7 @@ app.post("/api/auth/chat-recovery", async (req, res) => {
       });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
     const prompt = `You are "Vortex AI Support".
 The user has failed login attempts. User Context: "${userId || 'Unknown'}". User Message: "${message}".
 Guide them in 2 short sentences: They can click the "Forgot Password" button on the screen to answer their Security Question and reset their password instantly, or email vikram.2872006@gmail.com for help. English only.`;
@@ -270,7 +270,7 @@ app.post("/api/auth/update-qr-privacy", authMiddleware, async (req, res) => {
   }
 });
 
-// ---------------- BACKGROUND AI PROCESSOR FUNCTION ----------------
+// ---------------- BACKGROUND AI PROCESSOR (gemini-3.1-flash-lite) ----------------
 async function processDocumentAIBackground(docId, fileUrl, fileMimetype) {
   if (!GEMINI_API_KEY || !genAI || !fileUrl || fileUrl.includes("no-file")) return;
 
@@ -298,43 +298,25 @@ async function processDocumentAIBackground(docId, fileUrl, fileMimetype) {
 6. "renewalTip": Short renewal tip
 7. "summary": Brief note
 
-Return raw JSON only:
+Return raw JSON:
 {"personName":"","documentType":"","issueDate":"","validitySpan":"","expiryDate":null,"renewalTip":"","summary":""}`;
 
-    const candidateModels = [
-      "gemini-2.0-flash",
-      "gemini-2.0-flash-lite",
-      "gemini-1.5-flash-8b",
-      "gemini-1.5-flash"
-    ];
+    const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
+    const result = await model.generateContent([prompt, filePart]);
+    const cleanJson = result.response.text().replace(/```json/gi, "").replace(/```/g, "").trim();
+    const parsed = JSON.parse(cleanJson);
 
-    let result = null;
-    for (const modelName of candidateModels) {
-      try {
-        const model = genAI.getGenerativeModel({ model: modelName });
-        result = await model.generateContent([prompt, filePart]);
-        if (result && result.response) break;
-      } catch (e) {
-        console.warn(`Model ${modelName} fallback due to:`, e.message);
-      }
-    }
+    const updateData = {};
+    if (parsed.personName) updateData.personName = parsed.personName;
+    if (parsed.documentType) updateData.documentType = parsed.documentType;
+    if (parsed.issueDate) updateData.issueDate = parseAnyDateToUTC(parsed.issueDate);
+    if (parsed.expiryDate) updateData.importantDate = parseAnyDateToUTC(parsed.expiryDate);
+    if (parsed.validitySpan) updateData.validitySpan = parsed.validitySpan;
+    if (parsed.renewalTip) updateData.renewalTip = parsed.renewalTip;
+    if (parsed.summary) updateData.aiSummary = parsed.summary;
 
-    if (result) {
-      const cleanJson = result.response.text().replace(/```json/gi, "").replace(/```/g, "").trim();
-      const parsed = JSON.parse(cleanJson);
-
-      const updateData = {};
-      if (parsed.personName) updateData.personName = parsed.personName;
-      if (parsed.documentType) updateData.documentType = parsed.documentType;
-      if (parsed.issueDate) updateData.issueDate = parseAnyDateToUTC(parsed.issueDate);
-      if (parsed.expiryDate) updateData.importantDate = parseAnyDateToUTC(parsed.expiryDate);
-      if (parsed.validitySpan) updateData.validitySpan = parsed.validitySpan;
-      if (parsed.renewalTip) updateData.renewalTip = parsed.renewalTip;
-      if (parsed.summary) updateData.aiSummary = parsed.summary;
-
-      await Document.findByIdAndUpdate(docId, updateData);
-      console.log(`[Background AI] Document ${docId} processed and updated successfully.`);
-    }
+    await Document.findByIdAndUpdate(docId, updateData);
+    console.log(`[Background AI] Updated record ${docId} successfully.`);
   } catch (err) {
     console.error(`[Background AI Error for ${docId}]:`, err.message);
   }
@@ -376,10 +358,10 @@ app.post("/api/documents/upload", authMiddleware, upload.single("docFile"), asyn
 
     await newDoc.save();
 
-    // ⚡ 1. तुरंत यूजर को रिस्पॉन्स भेजें ताकि अपलोड 1 सेकंड में पूरा हो जाए
+    // ⚡ तुरंत यूज़र को रिस्पॉन्स भेजें (0 सेकंड वेट)
     res.status(201).json({ message: "Stored successfully", document: newDoc });
 
-    // ⚡ 2. बैकग्राउंड में बिना रुके AI चलाएं (साइट बंद होने पर भी यह डेटा भर देगा)
+    // ⚡ बैकग्राउंड में AI चलेगा (साइट बंद होने पर भी डेटाबेस अपडेट हो जाएगा)
     if (req.file) {
       processDocumentAIBackground(newDoc._id, fileUrl, fileType);
     }
