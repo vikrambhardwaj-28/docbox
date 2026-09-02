@@ -5,7 +5,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const path = require("path");
-const fs = require("fs");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
@@ -17,7 +16,7 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/my_custom_
 const JWT_SECRET = process.env.JWT_SECRET || "MY_CUSTOM_SECRET_KEY_2026";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Cloudinary Setup
+// ☁️ Cloudinary Configuration
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -133,7 +132,6 @@ app.post("/api/auth/signup", async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    
     const normalizedAnswer = securityAnswer.trim().toLowerCase();
     const hashedAnswer = await bcrypt.hash(normalizedAnswer, salt);
 
@@ -226,7 +224,7 @@ app.post("/api/auth/chat-recovery", async (req, res) => {
       });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `You are "Vortex AI Support".
 The user has failed login attempts. User Context: "${userId || 'Unknown'}". User Message: "${message}".
 Guide them in 2 short sentences: They can click the "Forgot Password" button on the screen to answer their Security Question and reset their password instantly, or email vikram.2872006@gmail.com for help. English only.`;
@@ -300,7 +298,7 @@ app.post("/api/documents/upload", authMiddleware, upload.single("docFile"), asyn
 
       if (GEMINI_API_KEY && genAI) {
         try {
-          const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
           
           // Cloudinary URL se buffer fetch karke base64 banana
           const fileFetch = await fetch(req.file.path);
