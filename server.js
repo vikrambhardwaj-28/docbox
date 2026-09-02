@@ -23,12 +23,16 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// PDF और Image दोनों के लिए सही Resource Type हैंडलिंग
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: "vortex_vault",
-    allowed_formats: ["jpg", "png", "jpeg", "pdf"],
-    resource_type: "auto"
+  params: async (req, file) => {
+    const isPdf = file.mimetype === "application/pdf" || file.originalname.toLowerCase().endsWith(".pdf");
+    return {
+      folder: "vortex_vault",
+      resource_type: isPdf ? "raw" : "auto",
+      public_id: Date.now() + "-" + Math.round(Math.random() * 1e9) + (isPdf ? ".pdf" : "")
+    };
   }
 });
 const upload = multer({ storage });
@@ -132,7 +136,6 @@ app.post("/api/auth/signup", async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    
     const normalizedAnswer = securityAnswer.trim().toLowerCase();
     const hashedAnswer = await bcrypt.hash(normalizedAnswer, salt);
 
@@ -270,33 +273,45 @@ app.post("/api/auth/update-qr-privacy", authMiddleware, async (req, res) => {
   }
 });
 
-// ---------------- BACKGROUND AI PROCESSOR (gemini-3.1-flash-lite) ----------------
+// ---------------- BACKGROUND AI PROCESSOR WITH INFINITE/EXPONENTIAL RETRY ----------------
 async function processDocumentAIBackground(docId, fileUrl, fileMimetype) {
   if (!GEMINI_API_KEY || !genAI || !fileUrl || fileUrl.includes("no-file")) return;
 
-  try {
-    const fileFetch = await fetch(fileUrl);
-    if (!fileFetch.ok) {
-      console.error(`[Background AI] Cloudinary fetch failed for doc: ${docId}`);
-      return;
-    }
-    const arrayBuffer = await fileFetch.arrayBuffer();
-    const base64Data = Buffer.from(arrayBuffer).toString("base64");
+  // Retry Delay Helper
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    // MIME-type normalization for Gemini API
-    let cleanMime = fileMimetype ? fileMimetype.split(";")[0].trim().toLowerCase() : "image/jpeg";
-    if (cleanMime === "application/octet-stream" || !cleanMime) {
-      cleanMime = fileUrl.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg";
-    }
+  let attempt = 0;
+  let delay = 3000; // पहला री-ट्राई 3 सेकंड में
 
-    const filePart = {
-      inlineData: {
-        data: base64Data,
-        mimeType: cleanMime
+  while (true) {
+    attempt++;
+    try {
+      // 1. Cloudinary से फाइल बफर प्राप्त करना
+      const fileFetch = await fetch(fileUrl);
+      if (!fileFetch.ok) {
+        console.error(`[Background AI Attempt ${attempt}] Cloudinary fetch failed for doc: ${docId}. Retrying in ${delay / 1000}s...`);
+        await wait(delay);
+        delay = Math.min(delay * 2, 30000); // मैक्सिमम 30s तक इंतज़ार
+        continue;
       }
-    };
 
-    const prompt = `Extract JSON from document:
+      const arrayBuffer = await fileFetch.arrayBuffer();
+      const base64Data = Buffer.from(arrayBuffer).toString("base64");
+
+      // 2. MIME Type क्लीन करना
+      let cleanMime = fileMimetype ? fileMimetype.split(";")[0].trim().toLowerCase() : "image/jpeg";
+      if (cleanMime === "application/octet-stream" || !cleanMime) {
+        cleanMime = fileUrl.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg";
+      }
+
+      const filePart = {
+        inlineData: {
+          data: base64Data,
+          mimeType: cleanMime
+        }
+      };
+
+      const prompt = `Extract JSON from document:
 1. "personName": Person / Customer name
 2. "documentType": Exact certificate/bill title
 3. "issueDate": DD/MM/YYYY
@@ -308,24 +323,30 @@ async function processDocumentAIBackground(docId, fileUrl, fileMimetype) {
 Return raw JSON only:
 {"personName":"","documentType":"","issueDate":"","validitySpan":"","expiryDate":null,"renewalTip":"","summary":""}`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
-    const result = await model.generateContent([prompt, filePart]);
-    const cleanJson = result.response.text().replace(/```json/gi, "").replace(/```/g, "").trim();
-    const parsed = JSON.parse(cleanJson);
+      // 3. gemini-3.1-flash-lite मॉडल कॉल
+      const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
+      const result = await model.generateContent([prompt, filePart]);
+      const cleanJson = result.response.text().replace(/```json/gi, "").replace(/```/g, "").trim();
+      const parsed = JSON.parse(cleanJson);
 
-    const updateData = {};
-    if (parsed.personName) updateData.personName = parsed.personName;
-    if (parsed.documentType) updateData.documentType = parsed.documentType;
-    if (parsed.issueDate) updateData.issueDate = parseAnyDateToUTC(parsed.issueDate);
-    if (parsed.expiryDate) updateData.importantDate = parseAnyDateToUTC(parsed.expiryDate);
-    if (parsed.validitySpan) updateData.validitySpan = parsed.validitySpan;
-    if (parsed.renewalTip) updateData.renewalTip = parsed.renewalTip;
-    if (parsed.summary) updateData.aiSummary = parsed.summary;
+      const updateData = {};
+      if (parsed.personName) updateData.personName = parsed.personName;
+      if (parsed.documentType) updateData.documentType = parsed.documentType;
+      if (parsed.issueDate) updateData.issueDate = parseAnyDateToUTC(parsed.issueDate);
+      if (parsed.expiryDate) updateData.importantDate = parseAnyDateToUTC(parsed.expiryDate);
+      if (parsed.validitySpan) updateData.validitySpan = parsed.validitySpan;
+      if (parsed.renewalTip) updateData.renewalTip = parsed.renewalTip;
+      if (parsed.summary) updateData.aiSummary = parsed.summary;
 
-    await Document.findByIdAndUpdate(docId, updateData);
-    console.log(`[Background AI] Document ${docId} parsed and saved successfully.`);
-  } catch (err) {
-    console.error(`[Background AI Error for ${docId}]:`, err.message);
+      await Document.findByIdAndUpdate(docId, updateData);
+      console.log(`[Background AI] Document ${docId} parsed and saved successfully on attempt ${attempt}!`);
+      break; // सफलता मिलने पर लूप समाप्त!
+
+    } catch (err) {
+      console.warn(`[Background AI Attempt ${attempt} Failed for ${docId}]: ${err.message}. Retrying in ${delay / 1000}s...`);
+      await wait(delay);
+      delay = Math.min(delay * 2, 30000); // 503 या हाई डिमांड पर एक्सपोनेंशियल बैकऑफ
+    }
   }
 }
 
@@ -365,10 +386,10 @@ app.post("/api/documents/upload", authMiddleware, upload.single("docFile"), asyn
 
     await newDoc.save();
 
-    // ⚡ 1. तुरंत रिस्पॉन्स (0 सेकंड इंतज़ार)
+    // ⚡ 1. तुरंत रिस्पॉन्स यूज़र को भेजें (0 सेकंड वेट)
     res.status(201).json({ message: "Stored successfully", document: newDoc });
 
-    // ⚡ 2. बैकग्राउंड में AI चलेगा (साइट बंद होने पर भी डेटाबेस में डिटेल्स भर देगा)
+    // ⚡ 2. बैकग्राउंड में Auto-Retry वाला AI चलेगा (डिटेल्स मिलने तक री-ट्राई करता रहेगा)
     if (req.file) {
       processDocumentAIBackground(newDoc._id, fileUrl, fileType);
     }
