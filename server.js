@@ -5,8 +5,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const path = require("path");
-const fs = require("fs");
 const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
@@ -15,29 +16,31 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/my_custom_
 const JWT_SECRET = process.env.JWT_SECRET || "MY_CUSTOM_SECRET_KEY_2026";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
+// ☁️ Cloudinary Configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "vortex_vault",
+    allowed_formats: ["jpg", "png", "jpeg", "pdf"],
+    resource_type: "auto"
+  }
+});
+const upload = multer({ storage });
+
 let genAI = null;
 if (GEMINI_API_KEY) {
   genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 }
 
-const uploadDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage });
-
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname)));
-app.use("/uploads", express.static(uploadDir));
 
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 app.get("/dashboard.html", (req, res) => res.sendFile(path.join(__dirname, "dashboard.html")));
@@ -222,7 +225,7 @@ app.post("/api/auth/chat-recovery", async (req, res) => {
       });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const prompt = `You are "Vortex AI Support".
 The user has failed login attempts. User Context: "${userId || 'Unknown'}". User Message: "${message}".
 Guide them in 2 short sentences: They can click the "Forgot Password" button on the screen to answer their Security Question and reset their password instantly, or email vikram.2872006@gmail.com for help. English only.`;
@@ -267,7 +270,77 @@ app.post("/api/auth/update-qr-privacy", authMiddleware, async (req, res) => {
   }
 });
 
-// ---------------- DOCUMENT UPLOAD & AI OCR ----------------
+// ---------------- BACKGROUND AI PROCESSOR FUNCTION ----------------
+async function processDocumentAIBackground(docId, fileUrl, fileMimetype) {
+  if (!GEMINI_API_KEY || !genAI || !fileUrl || fileUrl.includes("no-file")) return;
+
+  try {
+    const fileFetch = await fetch(fileUrl);
+    const arrayBuffer = await fileFetch.arrayBuffer();
+    const base64Data = Buffer.from(arrayBuffer).toString("base64");
+
+    let mimeType = fileMimetype || "image/jpeg";
+    if (mimeType === "application/octet-stream") mimeType = "image/jpeg";
+
+    const filePart = {
+      inlineData: {
+        data: base64Data,
+        mimeType: mimeType
+      }
+    };
+
+    const prompt = `Extract JSON from document:
+1. "personName": Person / Customer name
+2. "documentType": Exact certificate/bill title
+3. "issueDate": DD/MM/YYYY
+4. "validitySpan": Lifespan string
+5. "expiryDate": DD/MM/YYYY or null
+6. "renewalTip": Short renewal tip
+7. "summary": Brief note
+
+Return raw JSON only:
+{"personName":"","documentType":"","issueDate":"","validitySpan":"","expiryDate":null,"renewalTip":"","summary":""}`;
+
+    const candidateModels = [
+      "gemini-2.0-flash",
+      "gemini-2.0-flash-lite",
+      "gemini-1.5-flash-8b",
+      "gemini-1.5-flash"
+    ];
+
+    let result = null;
+    for (const modelName of candidateModels) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        result = await model.generateContent([prompt, filePart]);
+        if (result && result.response) break;
+      } catch (e) {
+        console.warn(`Model ${modelName} fallback due to:`, e.message);
+      }
+    }
+
+    if (result) {
+      const cleanJson = result.response.text().replace(/```json/gi, "").replace(/```/g, "").trim();
+      const parsed = JSON.parse(cleanJson);
+
+      const updateData = {};
+      if (parsed.personName) updateData.personName = parsed.personName;
+      if (parsed.documentType) updateData.documentType = parsed.documentType;
+      if (parsed.issueDate) updateData.issueDate = parseAnyDateToUTC(parsed.issueDate);
+      if (parsed.expiryDate) updateData.importantDate = parseAnyDateToUTC(parsed.expiryDate);
+      if (parsed.validitySpan) updateData.validitySpan = parsed.validitySpan;
+      if (parsed.renewalTip) updateData.renewalTip = parsed.renewalTip;
+      if (parsed.summary) updateData.aiSummary = parsed.summary;
+
+      await Document.findByIdAndUpdate(docId, updateData);
+      console.log(`[Background AI] Document ${docId} processed and updated successfully.`);
+    }
+  } catch (err) {
+    console.error(`[Background AI Error for ${docId}]:`, err.message);
+  }
+}
+
+// ---------------- DOCUMENT UPLOAD & INSTANT RESPONSE ----------------
 
 app.post("/api/documents/upload", authMiddleware, upload.single("docFile"), async (req, res) => {
   try {
@@ -277,12 +350,6 @@ app.post("/api/documents/upload", authMiddleware, upload.single("docFile"), asyn
     }
 
     let calculatedExpiryDate = manualDate ? parseAnyDateToUTC(manualDate) : null;
-    let extractedIssueDate = null;
-    let personName = "";
-    let documentType = "";
-    let validitySpan = "Permanent";
-    let renewalTip = "";
-    let aiSummary = "";
     let fileUrl = "/uploads/no-file";
     let fileName = "no-file";
     let fileOriginalName = "No File Attached";
@@ -291,51 +358,8 @@ app.post("/api/documents/upload", authMiddleware, upload.single("docFile"), asyn
     if (req.file) {
       fileName = req.file.filename;
       fileOriginalName = req.file.originalname;
-      fileUrl = `/uploads/${req.file.filename}`;
+      fileUrl = req.file.path; // Cloudinary secure CDN URL
       fileType = req.file.mimetype;
-
-      if (GEMINI_API_KEY && genAI) {
-        try {
-          const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
-          const filePath = path.join(uploadDir, req.file.filename);
-          
-          let mimeType = req.file.mimetype || "image/jpeg";
-          if (mimeType === "application/octet-stream") mimeType = "image/jpeg";
-
-          const filePart = {
-            inlineData: {
-              data: fs.readFileSync(filePath).toString("base64"),
-              mimeType: mimeType
-            }
-          };
-
-          const prompt = `Extract JSON from document:
-1. "personName": Person / Customer name
-2. "documentType": Exact certificate/bill title
-3. "issueDate": DD/MM/YYYY
-4. "validitySpan": Lifespan string
-5. "expiryDate": DD/MM/YYYY or null
-6. "renewalTip": Short renewal tip
-7. "summary": Brief note
-
-Return raw JSON:
-{"personName":"","documentType":"","issueDate":"","validitySpan":"","expiryDate":null,"renewalTip":"","summary":""}`;
-
-          const result = await model.generateContent([prompt, filePart]);
-          const cleanJson = result.response.text().replace(/```json/gi, "").replace(/```/g, "").trim();
-          const parsed = JSON.parse(cleanJson);
-
-          personName = parsed.personName || "";
-          documentType = parsed.documentType || "";
-          extractedIssueDate = parseAnyDateToUTC(parsed.issueDate);
-          if (!calculatedExpiryDate) calculatedExpiryDate = parseAnyDateToUTC(parsed.expiryDate);
-          validitySpan = parsed.validitySpan || "Permanent";
-          renewalTip = parsed.renewalTip || "";
-          aiSummary = parsed.summary || "";
-        } catch (aiErr) {
-          console.error("AI Scan Error:", aiErr.message);
-        }
-      }
     }
 
     const newDoc = new Document({
@@ -343,13 +367,7 @@ Return raw JSON:
       category: category || "Documents & certificates",
       title: title.trim(),
       physicalLocation: physicalLocation.trim(),
-      personName,
-      documentType,
-      issueDate: extractedIssueDate,
       importantDate: calculatedExpiryDate,
-      validitySpan,
-      renewalTip,
-      aiSummary,
       fileName,
       fileOriginalName,
       fileUrl,
@@ -357,7 +375,14 @@ Return raw JSON:
     });
 
     await newDoc.save();
-    return res.status(201).json({ message: "Stored successfully", document: newDoc });
+
+    // ⚡ 1. तुरंत यूजर को रिस्पॉन्स भेजें ताकि अपलोड 1 सेकंड में पूरा हो जाए
+    res.status(201).json({ message: "Stored successfully", document: newDoc });
+
+    // ⚡ 2. बैकग्राउंड में बिना रुके AI चलाएं (साइट बंद होने पर भी यह डेटा भर देगा)
+    if (req.file) {
+      processDocumentAIBackground(newDoc._id, fileUrl, fileType);
+    }
   } catch (err) {
     return res.status(500).json({ error: "Upload failed." });
   }
@@ -402,8 +427,11 @@ app.delete("/api/documents/:id", authMiddleware, async (req, res) => {
     if (!doc) return res.status(404).json({ error: "Not found." });
 
     if (doc.fileName && doc.fileName !== "no-file") {
-      const filePath = path.join(uploadDir, doc.fileName);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      try {
+        await cloudinary.uploader.destroy(doc.fileName);
+      } catch (cErr) {
+        console.warn("Cloudinary delete failed:", cErr.message);
+      }
     }
 
     await Document.findByIdAndDelete(req.params.id);
