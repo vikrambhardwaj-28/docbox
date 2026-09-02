@@ -296,7 +296,7 @@ app.post("/api/documents/upload", authMiddleware, upload.single("docFile"), asyn
 
       if (GEMINI_API_KEY && genAI) {
         try {
-          const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+          const model = genAI.getGenerativeModel({ model: "gemini-3.7-flash" });
           const filePath = path.join(uploadDir, req.file.filename);
           
           let mimeType = req.file.mimetype || "image/jpeg";
